@@ -1,4 +1,4 @@
-package com.example.tools
+package com.example.swipeclean
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

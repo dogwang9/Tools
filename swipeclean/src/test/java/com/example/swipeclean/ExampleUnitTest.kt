@@ -1,4 +1,4 @@
-package com.example.tools
+package com.example.swipeclean
 
 import org.junit.Test
 

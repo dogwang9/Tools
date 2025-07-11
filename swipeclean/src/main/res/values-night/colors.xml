@@ -1,0 +1,14 @@
+<resources>
+    <color name="text_main">#FFFFFF</color>
+    <color name="text_sub">#ABABAB</color>
+
+    <color name="bg_line">#262626</color>
+    <color name="bg_card">#28292B</color>
+    <color name="bg_window">#131313</color>
+    <color name="bg_progress">#0DFFFFFF</color>
+    <color name="bg_progress_deleted">#383838</color>
+
+    <color name="blue_main">#407DF6</color>
+    <color name="green_main">#32A67E</color>
+    <color name="red_main">#E55C5C</color>
+</resources>
