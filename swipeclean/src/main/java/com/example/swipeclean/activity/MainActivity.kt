@@ -106,10 +106,8 @@ class MainActivity : AppCompatActivity() {
                     .setCancelable(false)
                     .setNegativeButton("取消") { dialog, which -> }
                     .setPositiveButton("确认") { dialog, which ->
-
-                        val albumController = AlbumController.getInstance(this@MainActivity)
                         val album: Album? =
-                            albumController.albums?.find { it.getId() == albumId }
+                            AlbumController.getAlbums().find { it.getId() == albumId }
 
                         if (album?.photos?.isNotEmpty() == true) {
                             mLoadingView.visibility = View.VISIBLE
@@ -119,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                                 for (photo in album.photos) {
                                     photo.isDelete = false
                                     photo.isKeep = false
-                                    albumController.cleanCompletedPhoto(photo)
+                                    AlbumController.cleanCompletedPhoto(photo)
                                 }
 
                                 runOnUiThread {
@@ -161,7 +159,7 @@ class MainActivity : AppCompatActivity() {
         mLoadingView.visibility = View.VISIBLE
         lifecycleScope.launch(Dispatchers.IO) {
             val startTime = SystemClock.elapsedRealtime()
-            val albums = AlbumController.getInstance(this@MainActivity).loadAlbums()
+            val albums = AlbumController.loadAlbums()
 
             runOnUiThread {
                 val spendTime = SystemClock.elapsedRealtime() - startTime
@@ -278,9 +276,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isAlbumOperated(albumId: Long): Boolean {
-        val album = AlbumController.getInstance(this)
-            .albums
-            ?.find { it.getId() == albumId }
+        val album = AlbumController.getAlbums()
+            .find { it.getId() == albumId }
 
         return album?.photos.isNullOrEmpty() || album.isOperated()
     }

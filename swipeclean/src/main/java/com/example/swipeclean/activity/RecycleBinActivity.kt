@@ -56,7 +56,7 @@ class RecycleBinActivity : AppCompatActivity() {
         }
         initView()
 
-        mAlbum = AlbumController.getInstance(this).albums?.find { item ->
+        mAlbum = AlbumController.getAlbums().find { item ->
             item.getId() == intent.getLongExtra(KEY_INTENT_ALBUM_ID, 0)
         }
 
@@ -94,8 +94,7 @@ class RecycleBinActivity : AppCompatActivity() {
             mAdapter.removePhoto(photo)
             showTotalSize(mAdapter.getTotalSize())
             lifecycleScope.launch(Dispatchers.IO) {
-                AlbumController.getInstance(this@RecycleBinActivity)
-                    .converseDeleteToKeepPhoto(photo)
+                AlbumController.converseDeleteToKeepPhoto(photo)
             }
             photo.isKeep = true
             photo.isDelete = false
@@ -136,8 +135,7 @@ class RecycleBinActivity : AppCompatActivity() {
                             finishCount++
                             destPaths.add(photo.path)
                             mAlbum?.photos?.remove(photo)
-                            AlbumController.getInstance(this@RecycleBinActivity)
-                                .cleanCompletedPhoto(photo)
+                            AlbumController.cleanCompletedPhoto(photo)
 
                             val file = File(photo.path)
                             if (file.exists()) {
@@ -177,8 +175,7 @@ class RecycleBinActivity : AppCompatActivity() {
                 for (photo in mAdapter.photos) {
                     photo.isDelete = false
                     photo.isKeep = true
-                    AlbumController.getInstance(this@RecycleBinActivity)
-                        .converseDeleteToKeepPhoto(photo)
+                    AlbumController.converseDeleteToKeepPhoto(photo)
                 }
 
                 runOnUiThread {

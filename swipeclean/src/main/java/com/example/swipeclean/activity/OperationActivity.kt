@@ -125,7 +125,7 @@ class OperationActivity : AppCompatActivity() {
         mDownImageView.scaleY = DOWN_IMAGE_SCALE
         mTrashButton.isEnabled = false
 
-        mAlbum = AlbumController.getInstance(this).albums?.find { item ->
+        mAlbum = AlbumController.getAlbums().find { item ->
             item.getId() == intent.getLongExtra(KEY_INTENT_ALBUM_ID, 0)
         }
 
@@ -434,7 +434,7 @@ class OperationActivity : AppCompatActivity() {
             OperationType.Cancel -> {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
-                        AlbumController.getInstance(this@OperationActivity).cleanCompletedPhoto(
+                        AlbumController.cleanCompletedPhoto(
                             photo
                         )
                     }
@@ -447,7 +447,7 @@ class OperationActivity : AppCompatActivity() {
             OperationType.Keep -> {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
-                        AlbumController.getInstance(this@OperationActivity).addKeepPhoto(
+                        AlbumController.addKeepPhoto(
                             photo
                         )
                     }
@@ -459,7 +459,7 @@ class OperationActivity : AppCompatActivity() {
             OperationType.Delete -> {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
-                        AlbumController.getInstance(this@OperationActivity).addDeletePhoto(
+                        AlbumController.addDeletePhoto(
                             photo
                         )
                     }
