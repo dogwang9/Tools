@@ -58,12 +58,13 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        initView()
+        if (PermissionUtils.checkReadImagePermission(this)) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                AlbumController.syncDatabase()
+            }
+        }
 
-        // TODO: 在有权限时才进行同步
-//        lifecycleScope.launch(Dispatchers.IO) {
-//            AlbumController.getInstance(this@MainActivity).syncDatabase()
-//        }
+        initView()
     }
 
     override fun onStart() {
