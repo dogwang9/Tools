@@ -1,12 +1,18 @@
 package com.example.swipeclean.activity
 
 import android.content.res.Resources
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.provider.MediaStore
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -14,7 +20,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.lib.utils.MediaStoreUtils
+import com.example.lib.utils.PermissionUtils
 import com.example.lib.utils.StringUtils.getHumanFriendlyByteCount
 import com.example.swipeclean.adapter.RecyclerBinAdapter
 import com.example.swipeclean.business.AlbumController
@@ -28,12 +34,14 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.loadingindicator.LoadingIndicator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.File
 import java.util.Collections
 import java.util.Locale
 
 class RecycleBinActivity : AppCompatActivity() {
+
+    private val TAG = "RecycleBinActivity"
 
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: RecyclerBinAdapter
@@ -43,7 +51,39 @@ class RecycleBinActivity : AppCompatActivity() {
     private lateinit var mTitleTextView: TextView
     private lateinit var mLoadingView: LoadingIndicator
 
+    private var mDeletePhotos: List<Photo>? = null
     private var mAlbum: Album? = null
+
+    private val newDeleteLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                mLoadingView.visibility = View.VISIBLE
+                lifecycleScope.launch(Dispatchers.IO) {
+                    ConfigHost.setCleanedSize(
+                        mAdapter.getTotalSize(),
+                        this@RecycleBinActivity
+                    )
+                    mDeletePhotos!!.forEach {
+                        AlbumController.cleanCompletedPhoto(it)
+                        mAlbum?.photos?.remove(it)
+                    }
+                    delay(MIN_SHOW_LOADING_TIME)
+
+                    runOnUiThread {
+                        mLoadingView.visibility = View.GONE
+                        showDeleteResult()
+                    }
+                }
+            }
+        }
+
+    private val oldDeleteLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                useOldDelete()
+            }
+        }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,9 +126,10 @@ class RecycleBinActivity : AppCompatActivity() {
             finish()
             return
         }
-        Collections.reverse(deletedPhotos)
+        mDeletePhotos = deletedPhotos
+        Collections.reverse(mDeletePhotos!!)
         mAdapter = RecyclerBinAdapter(
-            deletedPhotos.toMutableList()
+            mDeletePhotos!!.toMutableList()
         ) { photo, position ->
             mAdapter.notifyItemRemoved(position)
             mAdapter.removePhoto(photo)
@@ -113,56 +154,32 @@ class RecycleBinActivity : AppCompatActivity() {
         showTotalSize(mAdapter.getTotalSize())
 
         mEmptyTrashButton.setOnClickListener {
-            MaterialAlertDialogBuilder(this)
-                .setTitle("删除图片")
-                .setMessage("一旦删除，图像将无法恢复")
-                .setPositiveButton(
-                    "删除"
-                ) { _, _ ->
-                    mLoadingView.visibility = View.VISIBLE
-                    val startTime = SystemClock.elapsedRealtime()
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("删除图片")
+                    .setMessage("一旦删除，图像将无法恢复")
+                    .setPositiveButton(
+                        "删除"
+                    ) { _, _ ->
+                        if (PermissionUtils.checkWritePermission(this)) {
+                            useOldDelete()
 
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        ConfigHost.setCleanedSize(
-                            mAdapter.getTotalSize(),
-                            this@RecycleBinActivity
-                        )
-                        val destPaths: MutableList<String> = ArrayList()
-                        var finishCount = 0
-
-                        for (photo in deletedPhotos) {
-                            finishCount++
-                            destPaths.add(photo.sourcePath)
-                            mAlbum?.photos?.remove(photo)
-                            AlbumController.cleanCompletedPhoto(photo)
-
-                            val file = File(photo.sourcePath)
-                            if (file.exists()) {
-                                file.delete()
-                            }
-
-                            if (finishCount % 100 == 0) {
-                                MediaStoreUtils.scan(this@RecycleBinActivity, destPaths)
-                                destPaths.clear()
-                            }
-                        }
-
-                        MediaStoreUtils.scan(this@RecycleBinActivity, destPaths)
-
-                        runOnUiThread {
-                            val spendTime = SystemClock.elapsedRealtime() - startTime
-                            mEmptyTrashButton.postDelayed(
-                                {
-                                    mLoadingView.visibility = View.GONE
-                                    showDeleteResult()
-                                },
-                                MIN_SHOW_LOADING_TIME - spendTime
-                            )
+                        } else {
+                            PermissionUtils.getWritePermission(this, oldDeleteLauncher)
                         }
                     }
-                }
-                .setNegativeButton("取消") { _, _ -> }
-                .show()
+                    .setNegativeButton("取消") { _, _ -> }
+                    .show()
+
+            } else {
+                newDeleteLauncher.launch(
+                    IntentSenderRequest.Builder(
+                        MediaStore.createDeleteRequest(
+                            contentResolver,
+                            mDeletePhotos!!.map { it.sourceUri }).intentSender
+                    ).build()
+                )
+            }
         }
 
         mRestoreAllButton.setOnClickListener {
@@ -214,5 +231,32 @@ class RecycleBinActivity : AppCompatActivity() {
             "垃圾箱",
             getHumanFriendlyByteCount(totalSize, 1)
         )
+    }
+
+    private fun useOldDelete() {
+        mLoadingView.visibility = View.VISIBLE
+        lifecycleScope.launch(Dispatchers.IO) {
+            ConfigHost.setCleanedSize(
+                mAdapter.getTotalSize(),
+                this@RecycleBinActivity
+            )
+            mDeletePhotos!!.forEach { photo ->
+                try {
+                    photo.sourceUri?.let {
+                        contentResolver.delete(it, null, null)
+                        AlbumController.cleanCompletedPhoto(photo)
+                        mAlbum?.photos?.remove(photo)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "删除失败 => Uri：${photo.sourceUri} ", e)
+                }
+            }
+            delay(MIN_SHOW_LOADING_TIME)
+
+            runOnUiThread {
+                mLoadingView.visibility = View.GONE
+                showDeleteResult()
+            }
+        }
     }
 }

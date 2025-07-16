@@ -162,7 +162,7 @@ class OperationActivity : AppCompatActivity() {
 
     private fun setPhoto(image: ImageView, photo: Photo) {
         Glide.with(this)
-            .load(photo.sourcePath)
+            .load(photo.sourceUri)
             .priority(Priority.HIGH)
             .error(R.drawable.ic_vector_image)
             .diskCacheStrategy(DiskCacheStrategy.ALL)

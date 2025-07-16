@@ -1,5 +1,6 @@
 package com.example.swipeclean.model
 
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
@@ -8,7 +9,6 @@ import com.example.swipeclean.other.Constants
 @Entity(tableName = "photo")
 data class Photo(
     val sourceId: Long,
-    val sourcePath: String,
     val size: Long,
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
@@ -16,6 +16,9 @@ data class Photo(
 ) {
     @Ignore
     var displayName: String = ""
+
+    @Ignore
+    var sourceUri: Uri? = null
 
     @Ignore
     var date: Long = 0
@@ -47,7 +50,6 @@ data class Photo(
     fun clone(photo: Photo): Photo {
         return Photo(
             photo.sourceId,
-            photo.sourcePath,
             photo.size,
             photo.id,
             photo.tag
@@ -56,6 +58,7 @@ data class Photo(
             this.date = photo.date
             this.width = photo.width
             this.height = photo.height
+            this.sourceUri = photo.sourceUri
         }
     }
 }

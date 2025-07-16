@@ -33,7 +33,7 @@ class RecyclerBinAdapter(
 
         Glide
             .with(context)
-            .load(photo.sourcePath)
+            .load(photo.sourceUri)
             .placeholder(R.drawable.ic_vector_image)
             .into(holder.mPhotoImageView);
 

@@ -1,5 +1,6 @@
 package com.example.swipeclean.business
 
+import android.content.ContentUris
 import android.content.Context
 import android.provider.MediaStore
 import androidx.annotation.WorkerThread
@@ -85,7 +86,6 @@ object AlbumController {
             val heightIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.HEIGHT)
             val displayNameIndex =
                 cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-            val pathIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idIndex)
                 val dateAdded = cursor.getLong(dateAddedIndex)
@@ -94,17 +94,18 @@ object AlbumController {
                 val width = cursor.getInt(widthIndex)
                 val height = cursor.getInt(heightIndex)
                 val displayName = cursor.getString(displayNameIndex)
-                val path = cursor.getString(pathIndex)
+                val uri =
+                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
 
                 val photo = Photo(
                     id,
-                    path,
                     size
                 ).apply {
                     this.displayName = displayName
                     this.date = if (dateTaken == 0L) dateAdded * 1000 else dateTaken
                     this.width = width
                     this.height = height
+                    this.sourceUri = uri
                     if (keepIds.contains(id)) doKeep() else if (deleteIds.contains(id)) doDelete()
                 }
 

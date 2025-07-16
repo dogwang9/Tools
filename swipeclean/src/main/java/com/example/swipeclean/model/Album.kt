@@ -1,14 +1,16 @@
 package com.example.swipeclean.model
 
+import android.net.Uri
+
 data class Album(
     val photos: MutableList<Photo>,
     val formatData: String
 ) {
 
-    fun getCoverPath(): String? {
+    fun getCoverUri(): Uri? {
         if (photos.isEmpty()) return null
         val photo = photos.firstOrNull { !it.isOperated() }
-        return photo?.sourcePath ?: photos.last().sourcePath
+        return photo?.sourceUri ?: photos.last().sourceUri
     }
 
     fun getId(): Long = formatData.hashCode().toLong()

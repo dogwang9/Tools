@@ -1,26 +1,22 @@
 package com.example.swipeclean.activity
 
-import android.content.ComponentName
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.SystemClock
-import android.provider.Settings
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.lib.utils.PermissionUtils
 import com.example.lib.utils.StringUtils
 import com.example.swipeclean.adapter.AlbumAdapter
 import com.example.swipeclean.business.AlbumController
@@ -47,6 +43,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mSortButton: MaterialButton
     private lateinit var mAdapter: AlbumAdapter
     private lateinit var mLoadingView: View
+    private val launcher: ActivityResultLauncher<String> =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            prepareData()
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -194,62 +194,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun prepareData() {
-        if (Build.VERSION.SDK_INT < 30) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    android.Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                    this,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                // TODO: 处理低版本的授权
-            }
+        if (!PermissionUtils.checkReadImagePermission(this)
+        ) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle("请授权")
+                .setMessage("授权以访问设备上的图片")
+                .setCancelable(false)
+                .setNegativeButton("关闭") { dialog, which ->
+                    finish()
+                }
+                .setPositiveButton("去授权") { dialog, which ->
+                    PermissionUtils.getReadImagePermission(this, launcher)
+                }
+                .show()
 
         } else {
-            if (!Environment.isExternalStorageManager()
-            ) {
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("请授权")
-                    .setMessage("授权以访问设备上的图片")
-                    .setCancelable(false)
-                    .setNegativeButton("关闭") { dialog, which ->
-                        finish()
-                    }
-                    .setPositiveButton("去授权") { dialog, which ->
-                        val intent = Intent(
-                            Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION,
-                            "package:${packageName}".toUri()
-                        )
-                        intent.setComponent(
-                            ComponentName(
-                                "com.android.settings",
-                                "com.android.settings.Settings\$AppManageExternalStorageActivity"
-                            )
-                        )
-
-                        if (packageManager.resolveActivity(
-                                intent,
-                                PackageManager.MATCH_DEFAULT_ONLY
-                            ) != null
-                        ) {
-                            startActivity(intent)
-
-                        } else {
-                            val intent =
-                                Intent(
-                                    Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                                    "package:${packageName}".toUri()
-                                )
-                            intent.addCategory(Intent.CATEGORY_DEFAULT)
-                            startActivity(intent)
-                        }
-                    }
-                    .show()
-
-            } else {
-                loadAlbums()
-            }
+            loadAlbums()
         }
     }
 

@@ -23,7 +23,7 @@ class AlbumAdapter(
     private val mAlbums = ArrayList<Album>()
 
     fun setData(albums: List<Album>) {
-        val newAlbums = albums.map{it.clone(it)}
+        val newAlbums = albums.map { it.clone(it) }
         val callback = MyDiffCallback(mAlbums, newAlbums)
         val diffResult = DiffUtil.calculateDiff(callback)
         mAlbums.clear()
@@ -47,10 +47,9 @@ class AlbumAdapter(
     ) {
         val context = holder.itemView.context
         val album = mAlbums[position]
-
         Glide
             .with(context)
-            .load(album.getCoverPath())
+            .load(album.getCoverUri())
             .placeholder(R.drawable.ic_vector_image)
             .into(holder.mCoverImageView)
 
