@@ -25,7 +25,7 @@ object PermissionUtils {
             Manifest.permission.READ_MEDIA_IMAGES
 
         // 当用户多次点击不在询问(一般是两次),授权界面就不再会出现
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
             launcher.launch(permission)
 
         } else {
@@ -54,7 +54,7 @@ object PermissionUtils {
         val permission = Manifest.permission.WRITE_EXTERNAL_STORAGE
 
         // 当用户多次点击不在询问(一般是两次),授权界面就不再会出现
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
             launcher.launch(permission)
 
         } else {
