@@ -10,7 +10,7 @@
     <color name="bg_card">#F6F7FB</color>
     <color name="bg_window">#FFFFFF</color>
     <color name="bg_progress">#F0F1F5</color>>
-    <color name="bg_progress_deleted">#E0E0E3</color>
+    <color name="bg_progress_deleted">#D1D1D3</color>
 
     <color name="blue_main">#2A6EF6</color>
     <color name="green_main">#03A670</color>

@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 
 object PermissionUtils {
 
+    // TODO: 处理 “部分访问”
     fun getReadImagePermission(activity: Activity, launcher: ActivityResultLauncher<String>) {
         if (checkReadImagePermission(activity)) {
             return
@@ -50,7 +51,7 @@ object PermissionUtils {
             return
         }
 
-        val permission =  Manifest.permission.WRITE_EXTERNAL_STORAGE
+        val permission = Manifest.permission.WRITE_EXTERNAL_STORAGE
 
         // 当用户多次点击不在询问(一般是两次),授权界面就不再会出现
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
