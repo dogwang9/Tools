@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun loadAlbums() {
+    fun loadAlbums(scrollToTop: Boolean = false) {
         mLoadingView.visibility = View.VISIBLE
         lifecycleScope.launch(Dispatchers.IO) {
             val startTime = SystemClock.elapsedRealtime()
@@ -185,7 +185,7 @@ class MainActivity : AppCompatActivity() {
                                     albums.size
                                 )
 
-                            sortAlbums(albums)
+                            sortAlbums(albums, scrollToTop)
                         }
                     },
                     MIN_SHOW_LOADING_TIME - spendTime
@@ -214,7 +214,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun sortAlbums(albums: ArrayList<Album>) {
+    private fun sortAlbums(albums: ArrayList<Album>, scrollToTop: Boolean = false) {
         when (ConfigHost.getSortType(this)) {
             SortDialogFragment.DATE_DOWN -> {
                 albums.sortByDescending(Album::getDateTime)
@@ -241,7 +241,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
         mAdapter.setData(albums)
-        mRecyclerView.scrollToPosition(0)
+        if (scrollToTop) {
+            mRecyclerView.scrollToPosition(0)
+        }
     }
 
     private fun isAlbumOperated(albumId: Long): Boolean {
