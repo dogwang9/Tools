@@ -1,6 +1,10 @@
 package com.example.lib.photoview
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +15,7 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -45,6 +50,9 @@ class PhotoViewFragment() : Fragment() {
 
     private var mListener: Listener? = null
     private lateinit var mViewpager: ViewPager2
+    private lateinit var mTitleBar: View
+    private lateinit var mMainView: View
+    private var mIsAnimating = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -85,7 +93,10 @@ class PhotoViewFragment() : Fragment() {
         val index = arguments.getInt(TAG_INDEX)
 
         val countTextView: TextView = view.findViewById(R.id.tv_count)
+        mTitleBar = view.findViewById(R.id.v_title_bar)
+        mMainView = view.findViewById(R.id.main)
         mViewpager = view.findViewById(R.id.v_viewpager)
+
         mViewpager.offscreenPageLimit = 2
         mViewpager.adapter = object : RecyclerView.Adapter<MyViewHolder>() {
             override fun onCreateViewHolder(
@@ -102,6 +113,9 @@ class PhotoViewFragment() : Fragment() {
                 position: Int
             ) {
                 mListener?.showPhoto(holder.photoView, position)
+                holder.photoView.setOnClickListener {
+                    doAnimator()
+                }
             }
 
             override fun getItemCount(): Int {
@@ -133,6 +147,57 @@ class PhotoViewFragment() : Fragment() {
             .beginTransaction()
             .remove(this@PhotoViewFragment)
             .commit()
+    }
+
+    private fun doAnimator() {
+        if (mIsAnimating) {
+            return
+        }
+        if (mTitleBar.isVisible) {
+            val hideColorAnimator = ObjectAnimator.ofArgb(
+                mMainView,
+                "backgroundColor",
+                Color.WHITE,
+                Color.BLACK
+            )
+            hideColorAnimator.duration = 200
+            hideColorAnimator.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator) {
+                    super.onAnimationStart(animation)
+                    mIsAnimating = true
+                    mTitleBar.visibility = View.GONE
+                }
+
+                override fun onAnimationEnd(animation: Animator) {
+                    super.onAnimationEnd(animation)
+                    mIsAnimating = false
+                }
+            })
+            hideColorAnimator.start()
+
+        } else {
+            val showColorAnimator = ObjectAnimator.ofArgb(
+                mMainView,
+                "backgroundColor",
+                Color.BLACK,
+                Color.WHITE
+            )
+            showColorAnimator.duration = 200
+            showColorAnimator.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator) {
+                    super.onAnimationStart(animation)
+                    mIsAnimating = true
+                }
+
+                override fun onAnimationEnd(animation: Animator) {
+                    super.onAnimationEnd(animation)
+                    mIsAnimating = false
+                    mTitleBar.visibility = View.VISIBLE
+                }
+            })
+            showColorAnimator.start()
+
+        }
     }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
