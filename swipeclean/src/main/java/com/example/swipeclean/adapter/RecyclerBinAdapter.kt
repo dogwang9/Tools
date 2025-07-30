@@ -11,7 +11,8 @@ import com.example.tools.R
 
 class RecyclerBinAdapter(
     val photos: MutableList<Photo>,
-    val onItemRestoreClick: (photo: Photo, position: Int) -> Unit
+    val onItemRestoreClick: (photo: Photo, position: Int) -> Unit,
+    val onItemClick: (photo: Photo, position: Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerBinAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -40,6 +41,9 @@ class RecyclerBinAdapter(
         holder.mKeepView.setOnClickListener {
             onItemRestoreClick.invoke(photo, position)
         }
+        holder.itemView.setOnClickListener {
+            onItemClick.invoke(photo, position)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -56,7 +60,7 @@ class RecyclerBinAdapter(
 
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var mPhotoImageView: ImageView = itemView.findViewById(R.id.iv_photo)
-        var mKeepView: ImageView = itemView.findViewById(R.id.iv_keep)
+        val mPhotoImageView: ImageView = itemView.findViewById(R.id.iv_photo)
+        val mKeepView: ImageView = itemView.findViewById(R.id.iv_keep)
     }
 }

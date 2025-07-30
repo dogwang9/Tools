@@ -7,6 +7,7 @@ import android.os.SystemClock
 import android.provider.MediaStore
 import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
@@ -19,6 +20,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.lib.photoview.PhotoViewFragment
 import com.example.lib.utils.PermissionUtils
 import com.example.lib.utils.StringUtils.getHumanFriendlyByteCount
 import com.example.swipeclean.adapter.RecyclerBinAdapter
@@ -38,7 +41,7 @@ import kotlinx.coroutines.launch
 import java.util.Collections
 import java.util.Locale
 
-class RecycleBinActivity : AppCompatActivity() {
+class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: RecyclerBinAdapter
     private lateinit var mEmptyTrashButton: View
@@ -107,6 +110,13 @@ class RecycleBinActivity : AppCompatActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
+    override fun showPhoto(imageView: ImageView, index: Int) {
+        Glide
+            .with(this)
+            .load(mAdapter.photos[index].sourceUri)
+            .into(imageView)
+    }
+
     private fun initView() {
         mRecyclerView = findViewById(R.id.v_recyclerview)
         mEmptyTrashButton = findViewById(R.id.btn_empty_trash)
@@ -126,20 +136,23 @@ class RecycleBinActivity : AppCompatActivity() {
         mDeletePhotos = deletedPhotos
         Collections.reverse(mDeletePhotos!!)
         mAdapter = RecyclerBinAdapter(
-            mDeletePhotos!!.toMutableList()
-        ) { photo, position ->
-            mAdapter.notifyItemRemoved(position)
-            mAdapter.removePhoto(photo)
-            showTotalSize(mAdapter.getTotalSize())
-            photo.doKeep()
-            lifecycleScope.launch(Dispatchers.IO) {
-                AlbumController.converseDeleteToKeepPhoto(photo)
-            }
+            mDeletePhotos!!.toMutableList(),
+            { photo, position ->
+                mAdapter.notifyItemRemoved(position)
+                mAdapter.removePhoto(photo)
+                showTotalSize(mAdapter.getTotalSize())
+                photo.doKeep()
+                lifecycleScope.launch(Dispatchers.IO) {
+                    AlbumController.converseDeleteToKeepPhoto(photo)
+                }
 
-            if (mAdapter.photos.isEmpty()) {
-                finish()
+                if (mAdapter.photos.isEmpty()) {
+                    finish()
+                }
+            }, { photo, position ->
+                PhotoViewFragment.show(this, position, mAdapter.photos.size)
             }
-        }
+        )
 
         val spanCount =
             3.coerceAtLeast((Resources.getSystem().displayMetrics.widthPixels / (140 * Resources.getSystem().displayMetrics.density)).toInt())

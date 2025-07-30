@@ -1,0 +1,16 @@
+<resources>
+    <color name="transparent">#00000000</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="text_main">#222222</color>
+    <color name="text_sub">#717171</color>
+
+    <color name="bg_line">#DCDDE0</color>
+    <color name="bg_card">#F6F7FB</color>
+
+    <color name="blue_main">#2A6EF6</color>
+    <color name="green_main">#03A670</color>
+    <color name="red_main">#E52233</color>
+
+</resources>

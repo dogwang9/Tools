@@ -69,7 +69,7 @@ class AlbumAdapter(
         if (album.isCompleted()) {
             holder.mCompletedImageView.visibility = View.VISIBLE
             holder.mCompletedView.visibility = View.VISIBLE
-            holder.mDateTextView.setTextColor(ContextCompat.getColor(context, R.color.text_sub))
+            holder.mDateTextView.setTextColor(ContextCompat.getColor(context, com.example.lib.R.color.text_sub))
             holder.mDateTextView.paintFlags =
                 holder.mDateTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             holder.itemView.setOnClickListener {
@@ -79,7 +79,7 @@ class AlbumAdapter(
         } else {
             holder.mCompletedImageView.visibility = View.GONE
             holder.mCompletedView.visibility = View.GONE
-            holder.mDateTextView.setTextColor(ContextCompat.getColor(context, R.color.text_main))
+            holder.mDateTextView.setTextColor(ContextCompat.getColor(context, com.example.lib.R.color.text_main))
             holder.mDateTextView.paintFlags =
                 holder.mDateTextView.paintFlags and (Paint.STRIKE_THRU_TEXT_FLAG.inv())
             holder.itemView.setOnClickListener {
@@ -97,12 +97,12 @@ class AlbumAdapter(
     }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var mCoverImageView: ImageView = itemView.findViewById(R.id.iv_cover)
-        var mDateTextView: TextView = itemView.findViewById(R.id.tv_date)
-        var mProgressTextView: TextView = itemView.findViewById(R.id.tv_progress)
-        var mProgressIndicator: DualProgressIndicator = itemView.findViewById(R.id.lp_progress)
-        var mCompletedImageView: ImageView = itemView.findViewById(R.id.iv_completed)
-        var mCompletedView: View = itemView.findViewById(R.id.v_completed)
+        val mCoverImageView: ImageView = itemView.findViewById(R.id.iv_cover)
+        val mDateTextView: TextView = itemView.findViewById(R.id.tv_date)
+        val mProgressTextView: TextView = itemView.findViewById(R.id.tv_progress)
+        val mProgressIndicator: DualProgressIndicator = itemView.findViewById(R.id.lp_progress)
+        val mCompletedImageView: ImageView = itemView.findViewById(R.id.iv_completed)
+        val mCompletedView: View = itemView.findViewById(R.id.v_completed)
     }
 
     class MyDiffCallback(val oldList: List<Album>, val newList: List<Album>) : DiffUtil.Callback() {

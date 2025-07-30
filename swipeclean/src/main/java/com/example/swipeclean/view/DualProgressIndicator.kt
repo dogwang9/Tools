@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
-import com.example.tools.R
 import com.google.android.material.progressindicator.LinearProgressIndicator
 
 class DualProgressIndicator(context: Context, attrs: AttributeSet) :
@@ -15,7 +14,7 @@ class DualProgressIndicator(context: Context, attrs: AttributeSet) :
     private val mPaint: Paint = Paint()
 
     init {
-        mPaint.setColor(ContextCompat.getColor(context, R.color.blue_main))
+        mPaint.setColor(ContextCompat.getColor(context, com.example.lib.R.color.blue_main))
         mPaint.style = Paint.Style.FILL
         mPaint.isAntiAlias = true
     }
