@@ -1,236 +1,207 @@
-package com.example.lib.photoview;
+package com.example.lib.photoview
 
-import android.content.Context;
-import android.graphics.Matrix;
-import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.util.AttributeSet;
-import android.view.GestureDetector;
+import android.content.Context
+import android.graphics.Matrix
+import android.graphics.RectF
+import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.util.AttributeSet
+import android.view.GestureDetector
+import androidx.appcompat.widget.AppCompatImageView
 
-import androidx.appcompat.widget.AppCompatImageView;
+class PhotoView(
+    context: Context,
+    attrs: AttributeSet
+) : AppCompatImageView(context, attrs) {
 
-public class PhotoView extends AppCompatImageView {
+    private var attacher: PhotoViewAttacher = PhotoViewAttacher(this)
+    private var pendingScaleType: ScaleType? = null
 
-    private PhotoViewAttacher attacher;
-    private ScaleType pendingScaleType;
+    init {
 
-    public PhotoView(Context context) {
-        this(context, null);
-    }
-
-    public PhotoView(Context context, AttributeSet attr) {
-        this(context, attr, 0);
-    }
-
-    public PhotoView(Context context, AttributeSet attr, int defStyle) {
-        super(context, attr, defStyle);
-        init();
-    }
-
-    private void init() {
-        attacher = new PhotoViewAttacher(this);
         //We always pose as a Matrix scale type, though we can change to another scale type
         //via the attacher
-        super.setScaleType(ScaleType.MATRIX);
+        super.setScaleType(ScaleType.MATRIX)
+
         //apply the previously applied scale type
         if (pendingScaleType != null) {
-            setScaleType(pendingScaleType);
-            pendingScaleType = null;
+            setScaleType(pendingScaleType!!)
+            pendingScaleType = null
         }
     }
 
     /**
-     * Get the current {@link PhotoViewAttacher} for this view. Be wary of holding on to references
+     * Get the current [PhotoViewAttacher] for this view. Be wary of holding on to references
      * to this attacher, as it has a reference to this view, which, if a reference is held in the
      * wrong place, can cause memory leaks.
      *
      * @return the attacher.
      */
-    public PhotoViewAttacher getAttacher() {
-        return attacher;
+    fun getAttacher(): PhotoViewAttacher? {
+        return attacher
     }
 
-    @Override
-    public ScaleType getScaleType() {
-        return attacher.getScaleType();
+    override fun getScaleType(): ScaleType? {
+        return attacher.getScaleType()
     }
 
-    @Override
-    public Matrix getImageMatrix() {
-        return attacher.getImageMatrix();
+    override fun getImageMatrix(): Matrix? {
+        return attacher.getImageMatrix()
     }
 
-    @Override
-    public void setOnLongClickListener(OnLongClickListener l) {
-        attacher.setOnLongClickListener(l);
+    override fun setOnLongClickListener(l: OnLongClickListener?) {
+        attacher.setOnLongClickListener(l)
     }
 
-    @Override
-    public void setOnClickListener(OnClickListener l) {
-        attacher.setOnClickListener(l);
+    override fun setOnClickListener(l: OnClickListener?) {
+        attacher.setOnClickListener(l)
     }
 
-    @Override
-    public void setScaleType(ScaleType scaleType) {
-        if (attacher == null) {
-            pendingScaleType = scaleType;
-        } else {
-            attacher.setScaleType(scaleType);
-        }
+    override fun setScaleType(scaleType: ScaleType) {
+        attacher.setScaleType(scaleType)
     }
 
-    @Override
-    public void setImageDrawable(Drawable drawable) {
-        super.setImageDrawable(drawable);
+    override fun setImageDrawable(drawable: Drawable?) {
+        super.setImageDrawable(drawable)
         // setImageBitmap calls through to this method
-        if (attacher != null) {
-            attacher.update();
-        }
+        attacher.update()
     }
 
-    @Override
-    public void setImageResource(int resId) {
-        super.setImageResource(resId);
-        if (attacher != null) {
-            attacher.update();
-        }
+    override fun setImageResource(resId: Int) {
+        super.setImageResource(resId)
+        attacher.update()
     }
 
-    @Override
-    public void setImageURI(Uri uri) {
-        super.setImageURI(uri);
-        if (attacher != null) {
-            attacher.update();
-        }
+    override fun setImageURI(uri: Uri?) {
+        super.setImageURI(uri)
+        attacher.update()
     }
 
-    @Override
-    protected boolean setFrame(int l, int t, int r, int b) {
-        boolean changed = super.setFrame(l, t, r, b);
+    override fun setFrame(l: Int, t: Int, r: Int, b: Int): Boolean {
+        val changed = super.setFrame(l, t, r, b)
         if (changed) {
-            attacher.update();
+            attacher.update()
         }
-        return changed;
+        return changed
     }
 
-    public void setRotationTo(float rotationDegree) {
-        attacher.setRotationTo(rotationDegree);
+    fun setRotationTo(rotationDegree: Float) {
+        attacher.setRotationTo(rotationDegree)
     }
 
-    public void setRotationBy(float rotationDegree) {
-        attacher.setRotationBy(rotationDegree);
+    fun setRotationBy(rotationDegree: Float) {
+        attacher.setRotationBy(rotationDegree)
     }
 
-    public boolean isZoomable() {
-        return attacher.isZoomable();
+    fun isZoomable(): Boolean {
+        return attacher.isZoomable()
     }
 
-    public void setZoomable(boolean zoomable) {
-        attacher.setZoomable(zoomable);
+    fun setZoomable(zoomable: Boolean) {
+        attacher.setZoomable(zoomable)
     }
 
-    public RectF getDisplayRect() {
-        return attacher.getDisplayRect();
+    fun getDisplayRect(): RectF? {
+        return attacher.getDisplayRect()
     }
 
-    public void getDisplayMatrix(Matrix matrix) {
-        attacher.getDisplayMatrix(matrix);
+    fun getDisplayMatrix(matrix: Matrix) {
+        attacher.getDisplayMatrix(matrix)
     }
 
-    @SuppressWarnings("UnusedReturnValue") public boolean setDisplayMatrix(Matrix finalRectangle) {
-        return attacher.setDisplayMatrix(finalRectangle);
+    fun setDisplayMatrix(finalRectangle: Matrix): Boolean {
+        return attacher.setDisplayMatrix(finalRectangle)
     }
 
-    public void getSuppMatrix(Matrix matrix) {
-        attacher.getSuppMatrix(matrix);
+    fun getSuppMatrix(matrix: Matrix) {
+        attacher.getSuppMatrix(matrix)
     }
 
-    public boolean setSuppMatrix(Matrix matrix) {
-        return attacher.setDisplayMatrix(matrix);
+    fun setSuppMatrix(matrix: Matrix): Boolean {
+        return attacher.setDisplayMatrix(matrix)
     }
 
-    public float getMinimumScale() {
-        return attacher.getMinimumScale();
+    fun getMinimumScale(): Float {
+        return attacher.getMinimumScale()
     }
 
-    public float getMediumScale() {
-        return attacher.getMediumScale();
+    fun getMediumScale(): Float {
+        return attacher.getMediumScale()
     }
 
-    public float getMaximumScale() {
-        return attacher.getMaximumScale();
+    fun getMaximumScale(): Float {
+        return attacher.getMaximumScale()
     }
 
-    public float getScale() {
-        return attacher.getScale();
+    fun getScale(): Float {
+        return attacher.getScale()
     }
 
-    public void setAllowParentInterceptOnEdge(boolean allow) {
-        attacher.setAllowParentInterceptOnEdge(allow);
+    fun setAllowParentInterceptOnEdge(allow: Boolean) {
+        attacher.setAllowParentInterceptOnEdge(allow)
     }
 
-    public void setMinimumScale(float minimumScale) {
-        attacher.setMinimumScale(minimumScale);
+    fun setMinimumScale(minimumScale: Float) {
+        attacher.setMinimumScale(minimumScale)
     }
 
-    public void setMediumScale(float mediumScale) {
-        attacher.setMediumScale(mediumScale);
+    fun setMediumScale(mediumScale: Float) {
+        attacher.setMediumScale(mediumScale)
     }
 
-    public void setMaximumScale(float maximumScale) {
-        attacher.setMaximumScale(maximumScale);
+    fun setMaximumScale(maximumScale: Float) {
+        attacher.setMaximumScale(maximumScale)
     }
 
-    public void setScaleLevels(float minimumScale, float mediumScale, float maximumScale) {
-        attacher.setScaleLevels(minimumScale, mediumScale, maximumScale);
+    fun setScaleLevels(minimumScale: Float, mediumScale: Float, maximumScale: Float) {
+        attacher.setScaleLevels(minimumScale, mediumScale, maximumScale)
     }
 
-    public void setOnMatrixChangeListener(OnMatrixChangedListener listener) {
-        attacher.setOnMatrixChangeListener(listener);
+    fun setOnMatrixChangeListener(listener: OnMatrixChangedListener?) {
+        attacher.setOnMatrixChangeListener(listener)
     }
 
-    public void setOnPhotoTapListener(OnPhotoTapListener listener) {
-        attacher.setOnPhotoTapListener(listener);
+    fun setOnPhotoTapListener(listener: OnPhotoTapListener?) {
+        attacher.setOnPhotoTapListener(listener)
     }
 
-    public void setOnOutsidePhotoTapListener(OnOutsidePhotoTapListener listener) {
-        attacher.setOnOutsidePhotoTapListener(listener);
+    fun setOnOutsidePhotoTapListener(listener: OnOutsidePhotoTapListener?) {
+        attacher.setOnOutsidePhotoTapListener(listener)
     }
 
-    public void setOnViewTapListener(OnViewTapListener listener) {
-        attacher.setOnViewTapListener(listener);
+    fun setOnViewTapListener(listener: OnViewTapListener?) {
+        attacher.setOnViewTapListener(listener)
     }
 
-    public void setOnViewDragListener(OnViewDragListener listener) {
-        attacher.setOnViewDragListener(listener);
+    fun setOnViewDragListener(listener: OnViewDragListener?) {
+        attacher.setOnViewDragListener(listener)
     }
 
-    public void setScale(float scale) {
-        attacher.setScale(scale);
+    fun setScale(scale: Float) {
+        attacher.setScale(scale)
     }
 
-    public void setScale(float scale, boolean animate) {
-        attacher.setScale(scale, animate);
+    fun setScale(scale: Float, animate: Boolean) {
+        attacher.setScale(scale, animate)
     }
 
-    public void setScale(float scale, float focalX, float focalY, boolean animate) {
-        attacher.setScale(scale, focalX, focalY, animate);
+    fun setScale(scale: Float, focalX: Float, focalY: Float, animate: Boolean) {
+        attacher.setScale(scale, focalX, focalY, animate)
     }
 
-    public void setZoomTransitionDuration(int milliseconds) {
-        attacher.setZoomTransitionDuration(milliseconds);
+    fun setZoomTransitionDuration(milliseconds: Int) {
+        attacher.setZoomTransitionDuration(milliseconds)
     }
 
-    public void setOnDoubleTapListener(GestureDetector.OnDoubleTapListener onDoubleTapListener) {
-        attacher.setOnDoubleTapListener(onDoubleTapListener);
+    fun setOnDoubleTapListener(onDoubleTapListener: GestureDetector.OnDoubleTapListener?) {
+        attacher.setOnDoubleTapListener(onDoubleTapListener)
     }
 
-    public void setOnScaleChangeListener(OnScaleChangedListener onScaleChangedListener) {
-        attacher.setOnScaleChangeListener(onScaleChangedListener);
+    fun setOnScaleChangeListener(onScaleChangedListener: OnScaleChangedListener?) {
+        attacher.setOnScaleChangeListener(onScaleChangedListener)
     }
 
-    public void setOnSingleFlingListener(OnSingleFlingListener onSingleFlingListener) {
-        attacher.setOnSingleFlingListener(onSingleFlingListener);
+    fun setOnSingleFlingListener(onSingleFlingListener: OnSingleFlingListener?) {
+        attacher.setOnSingleFlingListener(onSingleFlingListener)
     }
 }

@@ -1,13 +1,14 @@
-package com.example.lib.photoview;
+package com.example.lib.photoview
 
 interface OnGestureListener {
+    fun onDrag(dx: Float, dy: Float)
 
-    void onDrag(float dx, float dy);
+    fun onFling(
+        startX: Float, startY: Float, velocityX: Float,
+        velocityY: Float
+    )
 
-    void onFling(float startX, float startY, float velocityX,
-                 float velocityY);
+    fun onScale(scaleFactor: Float, focusX: Float, focusY: Float)
 
-    void onScale(float scaleFactor, float focusX, float focusY);
-
-    void onScale(float scaleFactor, float focusX, float focusY, float dx, float dy);
+    fun onScale(scaleFactor: Float, focusX: Float, focusY: Float, dx: Float, dy: Float)
 }

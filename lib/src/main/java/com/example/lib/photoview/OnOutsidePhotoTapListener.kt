@@ -1,11 +1,10 @@
-package com.example.lib.photoview;
+package com.example.lib.photoview
 
-import android.widget.ImageView;
+import android.widget.ImageView
 
-public interface OnOutsidePhotoTapListener {
-
+interface OnOutsidePhotoTapListener {
     /**
      * The outside of the photo has been tapped
      */
-    void onOutsidePhotoTap(ImageView imageView);
+    fun onOutsidePhotoTap(imageView: ImageView?)
 }
