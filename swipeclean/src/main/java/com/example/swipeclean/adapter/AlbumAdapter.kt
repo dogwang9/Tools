@@ -28,7 +28,7 @@ class AlbumAdapter(
         val diffResult = DiffUtil.calculateDiff(callback)
         mAlbums.clear()
         mAlbums.addAll(newAlbums)
-        diffResult.dispatchUpdatesTo(this);
+        diffResult.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(
@@ -54,34 +54,34 @@ class AlbumAdapter(
             .with(context)
             .load(album.getCoverUri())
             .placeholder(R.drawable.ic_vector_image)
-            .into(holder.mCoverImageView)
+            .into(holder.coverImageView)
 
         val totalCount = album.getTotalCount()
         val completedCunt = album.getCompletedCount()
         val operatedCount = album.getOperatedIndex()
 
-        holder.mDateTextView.text = album.formatData
-        holder.mProgressTextView.text =
+        holder.dateTextView.text = album.formatData
+        holder.progressTextView.text =
             String.format(Locale.getDefault(), "%d/%d %s", completedCunt, totalCount, "张照片")
-        holder.mProgressIndicator.setProgress(100 * operatedCount / totalCount)
-        holder.mProgressIndicator.setSecondaryProgress(100 * completedCunt / totalCount)
+        holder.progressIndicator.setProgress(100 * operatedCount / totalCount)
+        holder.progressIndicator.setSecondaryProgress(100 * completedCunt / totalCount)
 
         if (album.isCompleted()) {
-            holder.mCompletedImageView.visibility = View.VISIBLE
-            holder.mCompletedView.visibility = View.VISIBLE
-            holder.mDateTextView.setTextColor(ContextCompat.getColor(context, com.example.lib.R.color.text_sub))
-            holder.mDateTextView.paintFlags =
-                holder.mDateTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            holder.completedImageView.visibility = View.VISIBLE
+            holder.completedView.visibility = View.VISIBLE
+            holder.dateTextView.setTextColor(ContextCompat.getColor(context, com.example.lib.R.color.text_sub))
+            holder.dateTextView.paintFlags =
+                holder.dateTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             holder.itemView.setOnClickListener {
                 onItemClick.invoke(album.getId(), album.formatData, true)
             }
 
         } else {
-            holder.mCompletedImageView.visibility = View.GONE
-            holder.mCompletedView.visibility = View.GONE
-            holder.mDateTextView.setTextColor(ContextCompat.getColor(context, com.example.lib.R.color.text_main))
-            holder.mDateTextView.paintFlags =
-                holder.mDateTextView.paintFlags and (Paint.STRIKE_THRU_TEXT_FLAG.inv())
+            holder.completedImageView.visibility = View.GONE
+            holder.completedView.visibility = View.GONE
+            holder.dateTextView.setTextColor(ContextCompat.getColor(context, com.example.lib.R.color.text_main))
+            holder.dateTextView.paintFlags =
+                holder.dateTextView.paintFlags and (Paint.STRIKE_THRU_TEXT_FLAG.inv())
             holder.itemView.setOnClickListener {
                 onItemClick.invoke(album.getId(), album.formatData, false)
             }
@@ -97,12 +97,12 @@ class AlbumAdapter(
     }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val mCoverImageView: ImageView = itemView.findViewById(R.id.iv_cover)
-        val mDateTextView: TextView = itemView.findViewById(R.id.tv_date)
-        val mProgressTextView: TextView = itemView.findViewById(R.id.tv_progress)
-        val mProgressIndicator: DualProgressIndicator = itemView.findViewById(R.id.lp_progress)
-        val mCompletedImageView: ImageView = itemView.findViewById(R.id.iv_completed)
-        val mCompletedView: View = itemView.findViewById(R.id.v_completed)
+        val coverImageView: ImageView = itemView.findViewById(R.id.iv_cover)
+        val dateTextView: TextView = itemView.findViewById(R.id.tv_date)
+        val progressTextView: TextView = itemView.findViewById(R.id.tv_progress)
+        val progressIndicator: DualProgressIndicator = itemView.findViewById(R.id.lp_progress)
+        val completedImageView: ImageView = itemView.findViewById(R.id.iv_completed)
+        val completedView: View = itemView.findViewById(R.id.v_completed)
     }
 
     class MyDiffCallback(val oldList: List<Album>, val newList: List<Album>) : DiffUtil.Callback() {
@@ -126,12 +126,12 @@ class AlbumAdapter(
             oldItemPosition: Int,
             newItemPosition: Int
         ): Boolean {
-            val newAlbum = newList[newItemPosition];
-            val oldAlbum = oldList[oldItemPosition];
+            val newAlbum = newList[newItemPosition]
+            val oldAlbum = oldList[oldItemPosition]
 
             return newAlbum.getTotalCount() == oldAlbum.getTotalCount() &&
                     newAlbum.getCompletedCount() == oldAlbum.getCompletedCount() &&
-                    newAlbum.getOperatedIndex() == oldAlbum.getOperatedIndex();
+                    newAlbum.getOperatedIndex() == oldAlbum.getOperatedIndex()
         }
 
     }

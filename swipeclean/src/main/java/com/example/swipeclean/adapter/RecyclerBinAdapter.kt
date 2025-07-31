@@ -36,9 +36,9 @@ class RecyclerBinAdapter(
             .with(context)
             .load(photo.sourceUri)
             .placeholder(R.drawable.ic_vector_image)
-            .into(holder.mPhotoImageView);
+            .into(holder.photoImageView)
 
-        holder.mKeepView.setOnClickListener {
+        holder.keepView.setOnClickListener {
             onItemRestoreClick.invoke(photo, position)
         }
         holder.itemView.setOnClickListener {
@@ -60,7 +60,7 @@ class RecyclerBinAdapter(
 
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val mPhotoImageView: ImageView = itemView.findViewById(R.id.iv_photo)
-        val mKeepView: ImageView = itemView.findViewById(R.id.iv_keep)
+        val photoImageView: ImageView = itemView.findViewById(R.id.iv_photo)
+        val keepView: ImageView = itemView.findViewById(R.id.iv_keep)
     }
 }
