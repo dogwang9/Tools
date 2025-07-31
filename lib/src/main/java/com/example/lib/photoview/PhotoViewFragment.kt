@@ -2,6 +2,7 @@ package com.example.lib.photoview
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Color
@@ -153,15 +154,32 @@ class PhotoViewFragment() : Fragment() {
         if (mIsAnimating) {
             return
         }
+        val animatorSet = AnimatorSet()
+        animatorSet.duration = 200
         if (mTitleBar.isVisible) {
-            val hideColorAnimator = ObjectAnimator.ofArgb(
+            val colorAnimator = ObjectAnimator.ofArgb(
                 mMainView,
                 "backgroundColor",
                 Color.WHITE,
                 Color.BLACK
             )
-            hideColorAnimator.duration = 200
-            hideColorAnimator.addListener(object : AnimatorListenerAdapter() {
+            val titleBarColorAnimator = ObjectAnimator.ofArgb(
+                mTitleBar,
+                "backgroundColor",
+                Color.WHITE,
+                Color.BLACK
+            )
+            val alphaAnimator = ObjectAnimator.ofFloat(
+                mTitleBar,
+                View.ALPHA,
+                0f
+            )
+            animatorSet.playTogether(
+                colorAnimator,
+                alphaAnimator,
+                titleBarColorAnimator
+            )
+            animatorSet.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     mIsAnimating = true
@@ -173,17 +191,31 @@ class PhotoViewFragment() : Fragment() {
                     mIsAnimating = false
                 }
             })
-            hideColorAnimator.start()
 
         } else {
-            val showColorAnimator = ObjectAnimator.ofArgb(
+            val colorAnimator = ObjectAnimator.ofArgb(
                 mMainView,
                 "backgroundColor",
                 Color.BLACK,
                 Color.WHITE
             )
-            showColorAnimator.duration = 200
-            showColorAnimator.addListener(object : AnimatorListenerAdapter() {
+            val titleBarColorAnimator = ObjectAnimator.ofArgb(
+                mTitleBar,
+                "backgroundColor",
+                Color.BLACK,
+                Color.WHITE
+            )
+            val alphaAnimator = ObjectAnimator.ofFloat(
+                mTitleBar,
+                View.ALPHA,
+                1f
+            )
+            animatorSet.playTogether(
+                colorAnimator,
+                alphaAnimator,
+                titleBarColorAnimator
+            )
+            animatorSet.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     mIsAnimating = true
@@ -195,9 +227,8 @@ class PhotoViewFragment() : Fragment() {
                     mTitleBar.visibility = View.VISIBLE
                 }
             })
-            showColorAnimator.start()
-
         }
+        animatorSet.start()
     }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
