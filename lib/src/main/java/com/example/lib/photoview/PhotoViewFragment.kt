@@ -169,26 +169,26 @@ class PhotoViewFragment() : Fragment() {
                 Color.WHITE,
                 Color.BLACK
             )
-            val alphaAnimator = ObjectAnimator.ofFloat(
+            val translateAnimator = ObjectAnimator.ofFloat(
                 mTitleBar,
-                View.ALPHA,
-                0f
+                View.TRANSLATION_Y,
+                -mTitleBar.height.toFloat()
             )
             animatorSet.playTogether(
                 colorAnimator,
-                alphaAnimator,
-                titleBarColorAnimator
+                titleBarColorAnimator,
+                translateAnimator
             )
             animatorSet.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     mIsAnimating = true
-                    mTitleBar.visibility = View.GONE
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     mIsAnimating = false
+                    mTitleBar.visibility = View.GONE
                 }
             })
 
@@ -205,26 +205,26 @@ class PhotoViewFragment() : Fragment() {
                 Color.BLACK,
                 Color.WHITE
             )
-            val alphaAnimator = ObjectAnimator.ofFloat(
+            val translateAnimator = ObjectAnimator.ofFloat(
                 mTitleBar,
-                View.ALPHA,
-                1f
+                View.TRANSLATION_Y,
+                0f
             )
             animatorSet.playTogether(
                 colorAnimator,
-                alphaAnimator,
-                titleBarColorAnimator
+                titleBarColorAnimator,
+                translateAnimator
             )
             animatorSet.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     mIsAnimating = true
+                    mTitleBar.visibility = View.VISIBLE
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     mIsAnimating = false
-                    mTitleBar.visibility = View.VISIBLE
                 }
             })
         }
