@@ -138,6 +138,16 @@ class PhotoViewFragment() : Fragment() {
             mViewpager.setCurrentItem(index, false)
         }
 
+        mViewpager.setPageTransformer { page, position ->
+            val clampedPosition = position.coerceIn(-1f, 1f)
+            val scale = 1f - kotlin.math.abs(clampedPosition) * 0.2f
+            val alpha = 1f - kotlin.math.abs(clampedPosition) * 0.4f
+
+            page.scaleX = scale
+            page.scaleY = scale
+            page.alpha = alpha
+        }
+
         view.findViewById<Button>(R.id.btn_back).setOnClickListener {
             close()
         }
