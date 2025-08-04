@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
@@ -525,44 +524,6 @@ class OperationActivity : AppCompatActivity() {
         return outputBitmap
     }
 
-    private fun getDisplayedImageRect(imageView: ImageView): RectF? {
-        val drawable = imageView.drawable ?: return null
-
-        val intrinsicWidth = drawable.intrinsicWidth
-        val intrinsicHeight = drawable.intrinsicHeight
-        val imageViewWidth = imageView.width
-        val imageViewHeight = imageView.height
-
-        val matrix = imageView.imageMatrix
-        val values = FloatArray(9)
-        matrix.getValues(values)
-
-        val scaleX = values[Matrix.MSCALE_X]
-        val scaleY = values[Matrix.MSCALE_Y]
-
-        val displayedWidth = intrinsicWidth * scaleX
-        val displayedHeight = intrinsicHeight * scaleY
-
-        var translateX = values[Matrix.MTRANS_X]
-        var translateY = values[Matrix.MTRANS_Y]
-
-        if (displayedWidth < imageViewWidth) {
-            translateX = (imageViewWidth - displayedWidth) / 2
-        }
-
-        if (displayedHeight < imageViewHeight) {
-            translateY = (imageViewHeight - displayedHeight) / 2
-        }
-
-        val left = translateX
-        val top = translateY
-        val right = translateX + displayedWidth
-        val bottom = translateY + displayedHeight
-
-        return RectF(left, top, right, bottom)
-    }
-
-
     private val mOnTouchListener = OnTouchListener { view: View, motionEvent: MotionEvent ->
         view.performClick()
         //Only first finger interactions are processed
@@ -590,7 +551,7 @@ class OperationActivity : AppCompatActivity() {
                 }
             }
 
-            mUpImageViewRectF = getDisplayedImageRect(mUpImageView)
+            mUpImageViewRectF = AndroidUtils.getVisibleImageRect(mUpImageView)
             if (mUpImageViewRectF != null && mUpImageViewRectF!!.contains(x, y)) {
                 mShowMagnifyPhotoRunnable = Runnable {
                     showMagnifyImageView(
