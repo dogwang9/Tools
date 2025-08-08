@@ -7,4 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="text_main">#222222</color>
+    <color name="text_sub">#717171</color>
+    <color name="divide_line">#EAECEF</color>
+    <color name="red_main">#E52233</color>
+    <color name="bg_dialog">#FFFFFF</color>
+    <color name="bg_window">#FFFFFF</color>
+    <color name="stroke_color">#717171</color>
 </resources>

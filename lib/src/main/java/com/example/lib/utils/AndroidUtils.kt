@@ -1,12 +1,32 @@
 package com.example.lib.utils
 
+import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.Context.CLIPBOARD_SERVICE
+import android.content.Context.INPUT_METHOD_SERVICE
+import android.content.Intent
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.BitmapFactory
 import android.graphics.RectF
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Environment
+import android.os.StatFs
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.webkit.MimeTypeMap
 import android.widget.ImageView
+import androidx.annotation.RequiresPermission
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
+import java.io.File
+import java.util.Locale
 
 object AndroidUtils {
 
@@ -61,6 +81,131 @@ object AndroidUtils {
         } catch (e: Exception) {
             e.printStackTrace()
             Pair(0, 0)
+        }
+    }
+
+    //判断啊网络是否可用
+    @RequiresPermission("android.permission.ACCESS_NETWORK_STATE")
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val network = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities =
+            connectivityManager.getNetworkCapabilities(network) ?: return false
+        return when {
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            else -> false
+        }
+    }
+
+    //获取粘贴板的内容
+    fun getTextFromClipboard(context: Context): String {
+        val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = clipboard.primaryClip
+
+        return if (clipData != null && clipData.itemCount > 0) {
+            clipData.getItemAt(0).coerceToText(context).toString()
+        } else {
+            ""
+        }
+    }
+
+    //清空粘贴板
+    fun clearClipboard(context: Context) {
+        val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val emptyClipData = ClipData.newPlainText("", "")
+        clipboard.setPrimaryClip(emptyClipData)
+    }
+
+    //隐藏软键盘
+    fun hideKeyboard(context: Context, view: View) {
+        val imm = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    //判断是否为黑暗模式
+    fun isDarkMode(context: Context): Boolean {
+        return when (AppCompatDelegate.getDefaultNightMode()) {
+            AppCompatDelegate.MODE_NIGHT_NO -> false
+            AppCompatDelegate.MODE_NIGHT_YES -> true
+            else -> (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        }
+    }
+
+    //获取内部存储空间
+    fun getTotalInternalStorage(): Long {
+        val path = Environment.getDataDirectory()
+        val stat = StatFs(path.path)
+        return stat.blockCountLong * stat.blockSizeLong
+    }
+
+    //获取内部可用存储空间
+    fun getAvailableInternalStorageSize(): Long {
+        val path = Environment.getDataDirectory()
+        val stat = StatFs(path.path)
+        return stat.availableBlocksLong * stat.blockSizeLong
+    }
+
+    //分享文件
+    fun shareFile(context: Context, path: String?) {
+        if (path.isNullOrEmpty()) return
+
+        val file = File(path)
+        if (!file.exists()) return
+
+        val fileName = file.name
+        val dotIndex = fileName.lastIndexOf('.')
+
+        val extension = if (dotIndex != -1) {
+            fileName.substring(dotIndex + 1).lowercase(Locale.ROOT)
+        } else {
+            ""
+        }
+
+        val mimeType = MimeTypeMap.getSingleton()
+            .getMimeTypeFromExtension(extension) ?: "*/*"
+
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.file_provider",
+            file
+        )
+
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = mimeType
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
+        val chooserIntent = Intent.createChooser(shareIntent, file.name)
+        if (context !is Activity) {
+            chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+        context.startActivity(chooserIntent)
+    }
+
+    //打开网址
+    fun openUrl(context: Context, url: String?) {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = url?.toUri()
+        context.startActivity(intent)
+    }
+
+    //在文件名的最后 拼接上时间戳 保证唯一性
+    fun appendTimestampToFilename(filename: String): String {
+        val dotIndex = filename.lastIndexOf('.')
+        val timestamp = System.currentTimeMillis()
+
+        return if (dotIndex != -1) {
+            val name = filename.substring(0, dotIndex)
+            val extension = filename.substring(dotIndex)
+            "${name}_$timestamp$extension"
+        } else {
+            "${filename}_$timestamp"
         }
     }
 

@@ -1,3 +1,20 @@
 <resources>
-    <string name="app_name">downloader</string>
+    <string name="app_name">Downloader</string>
+
+    <string name="tab_download">Download</string>
+    <string name="tab_history">History</string>
+    <string name="url_is_empty">Url is empty</string>
+    <string name="url_is_illegal">Url is illegal</string>
+    <string name="network_not_available">Network not available</string>
+    <string name="detected_url">A copied url has been detected</string>
+    <string name="inspect_and_clear_clipboard">Inspect and clear clipboard</string>
+    <string name="clear_clipboard">Clear clipboard</string>
+    <string name="video_link">Video link</string>
+    <string name="unavailable">Unavailable</string>
+    <string name="failed">Failed</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
+    <string name="all">All</string>
+    <string name="re_download">Re-download</string>
+    <string name="insufficient_storage_space">Insufficient storage space</string>
 </resources>

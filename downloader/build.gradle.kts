@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.devtools.ksp")
+    kotlin("plugin.parcelize")
 }
 
 android {
@@ -45,4 +47,13 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(project(":lib"))
+
+    implementation(libs.glide)
+    implementation(libs.eventbus)
+    implementation(libs.room)
+    implementation(libs.commons.io)
+    implementation(libs.org.apache.commons)
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.annotations)
+    ksp(libs.room.compiler)
 }

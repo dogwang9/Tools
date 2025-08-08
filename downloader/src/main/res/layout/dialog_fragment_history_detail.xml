@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="20dp"
+    android:paddingTop="20dp">
+
+    <View
+        android:id="@+id/v_head"
+        android:layout_width="30dp"
+        android:layout_height="4dp"
+        android:background="@drawable/shape_bottom_sheet_handler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/text_main"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@id/v_head"
+        tools:text="海滩上的风景" />
+
+    <TextView
+        android:id="@+id/tv_uploader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/text_sub"
+        android:textSize="12sp"
+        app:layout_constraintTop_toBottomOf="@id/tv_title"
+        tools:text="iss" />
+
+    <TextView
+        android:id="@+id/tv_source_and_upload_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_sub"
+        android:textSize="12sp"
+        app:layout_constraintTop_toBottomOf="@id/tv_uploader"
+        tools:text="Youtube · 2025年6月9日" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_url"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_vector_history_detail_url"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_url" />
+
+    <TextView
+        android:id="@+id/tv_url"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_url"
+        app:layout_constraintTop_toBottomOf="@+id/tv_source_and_upload_time"
+        tools:text="https://www.youtube.com/watch?v=U9wc4e6c1lM" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_download_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/ic_vector_history_detail_download_info"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_url" />
+
+    <TextView
+        android:id="@+id/tv_download_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textColor="@color/text_main"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/iv_download_info"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_download_info"
+        app:layout_constraintTop_toTopOf="@id/iv_download_info"
+        tools:text="2025年6月9日" />
+
+    <TextView
+        android:id="@+id/tv_download_path"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@id/tv_download_date"
+        app:layout_constraintStart_toStartOf="@id/tv_download_date"
+        app:layout_constraintTop_toBottomOf="@id/tv_download_date"
+        tools:text="/storage/emulated/0/Download/download_test/【Vlog】OLの悩み、よかったら聞いてください_1749454995698.webm" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/bt_operation"
+        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintBottom_toBottomOf="@id/bt_delete"
+        app:layout_constraintEnd_toStartOf="@id/bt_delete"
+        app:layout_constraintTop_toTopOf="@id/bt_delete"
+        tools:text="@string/re_download" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/bt_delete"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
+        android:text="@string/delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_download_path"
+        app:layout_goneMarginTop="30dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
