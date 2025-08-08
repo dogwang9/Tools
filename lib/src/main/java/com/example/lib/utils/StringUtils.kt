@@ -11,7 +11,9 @@ import kotlin.math.pow
 
 object StringUtils {
 
-    // 把bytes转化为kb/mb/gb
+    /**
+     * 把bytes转化为kb/mb/gb
+     */
     fun getHumanFriendlyByteCount(bytes: Long, decimalPlaces: Int = 1): String {
         val unit = 1024L
         val units = "KMGTPE"
@@ -26,7 +28,9 @@ object StringUtils {
         return "%.${decimalPlaces}f %sB".format(locale, result, prefix)
     }
 
-    //把时长转化为 00：00的形式
+    /**
+     * 把时长转化为 00：00的形式
+     */
     fun formatDuration(
         seconds: Long,
         withColon: Boolean = true,
@@ -66,24 +70,38 @@ object StringUtils {
         }
     }
 
-    //20250609 -> 根据不同国家显示合适的格式
-    fun formatDate(dateStr: String?, locale: Locale = Locale.getDefault()): String {
+    /**
+     * 时间字符串(eg:20000202) -> 根据不同国家显示合适的格式
+     */
+    fun formatDate(
+        dateStr: String?,
+        style: Int = SimpleDateFormat.LONG,
+        locale: Locale = Locale.getDefault()
+    ): String {
         if (TextUtils.isEmpty(dateStr)) return ""
         val inputFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
         val date = inputFormat.parse(dateStr!!)
 
-        val localizedFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, locale)
+        val localizedFormat = SimpleDateFormat.getDateInstance(style, locale)
         return localizedFormat.format(date!!)
     }
 
-    //时间戳 -> 根据不同国家显示合适的格式
-    fun formatDate(timestamp: Long, locale: Locale = Locale.getDefault()): String {
+    /**
+     * 时间戳 -> 根据不同国家显示合适的格式
+     */
+    fun formatDate(
+        timestamp: Long,
+        style: Int = SimpleDateFormat.LONG,
+        locale: Locale = Locale.getDefault()
+    ): String {
         val date = Date(timestamp)
-        val localizedFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, locale)
+        val localizedFormat = SimpleDateFormat.getDateInstance(style, locale)
         return localizedFormat.format(date)
     }
 
-    //判断url是否合法
+    /**
+     * 判断url是否合法
+     */
     fun isValidWebUrl(text: String): Boolean {
         if (text.isEmpty()) {
             return false
@@ -92,7 +110,9 @@ object StringUtils {
         return urlPattern.matcher(text).matches()
     }
 
-    //加工url(去除http前面无用的字段)
+    /**
+     * 加工url(去除http前面无用的字段)
+     */
     fun processUrl(url: String): String {
         return if (url.contains("http")) {
             url.substring(url.indexOf("http"))

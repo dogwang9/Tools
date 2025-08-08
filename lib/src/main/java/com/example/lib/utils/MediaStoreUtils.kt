@@ -8,11 +8,17 @@ import androidx.annotation.WorkerThread
 
 object MediaStoreUtils {
 
+    /**
+     * 扫描媒体库
+     */
     @WorkerThread
     fun scan(context: Context, paths: List<String>) {
         scan(context, *paths.toTypedArray())
     }
 
+    /**
+     * 扫描媒体库
+     */
     @WorkerThread
     fun scan(
         context: Context,
@@ -24,6 +30,9 @@ object MediaStoreUtils {
         }
     }
 
+    /**
+     * 扫描媒体库
+     */
     @WorkerThread
     fun scan(context: Context, uri: Uri) {
         val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)

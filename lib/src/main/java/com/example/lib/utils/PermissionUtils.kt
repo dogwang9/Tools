@@ -15,6 +15,9 @@ import androidx.core.content.ContextCompat
 object PermissionUtils {
 
     // TODO: 处理 “部分访问”
+    /**
+     * 获取读图片权限
+     */
     fun getReadImagePermission(activity: Activity, launcher: ActivityResultLauncher<String>) {
         if (checkReadImagePermission(activity)) {
             return
@@ -36,6 +39,9 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * 检查读图片权限
+     */
     fun checkReadImagePermission(context: Context): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
@@ -46,6 +52,9 @@ object PermissionUtils {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    /**
+     * 获取写文件权限
+     */
     fun getWritePermission(activity: Activity, launcher: ActivityResultLauncher<String>) {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q || checkWritePermission(activity)) {
             return
@@ -65,6 +74,9 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * 检查写文件权限
+     */
     fun checkWritePermission(context: Context): Boolean {
         return ContextCompat.checkSelfPermission(
             context,

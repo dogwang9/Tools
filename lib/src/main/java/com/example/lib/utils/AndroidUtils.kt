@@ -30,19 +30,30 @@ import java.util.Locale
 
 object AndroidUtils {
 
+    /**
+     * 获取屏幕宽度
+     */
     fun getScreenWidth(): Int {
         return Resources.getSystem().displayMetrics.widthPixels
     }
 
+    /**
+     * 获取屏幕高度
+     */
     fun getScreenHeight(): Int {
         return Resources.getSystem().displayMetrics.heightPixels
     }
 
+    /**
+     * dp -> px
+     */
     fun dpToPx(dp: Int): Int {
         return (Resources.getSystem().displayMetrics.density * dp).toInt()
     }
 
-    //获取imageview的真实显示区域
+    /**
+     * 获取图片在imageview中的真实显示区域
+     */
     fun getVisibleImageRect(imageView: ImageView): RectF? {
         val drawable = imageView.drawable ?: return null
         val drawableRect =
@@ -51,7 +62,9 @@ object AndroidUtils {
         return drawableRect
     }
 
-    //根据uri获取图片的宽高
+    /**
+     * 根据uri获取图片的宽高
+     */
     fun getImageSizeFromUri(context: Context, uri: Uri): Pair<Int, Int>? {
         return try {
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -84,7 +97,9 @@ object AndroidUtils {
         }
     }
 
-    //判断啊网络是否可用
+    /**
+     * 判断啊网络是否可用
+     */
     @RequiresPermission("android.permission.ACCESS_NETWORK_STATE")
     fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager =
@@ -101,7 +116,9 @@ object AndroidUtils {
         }
     }
 
-    //获取粘贴板的内容
+    /**
+     * 获取粘贴板的内容
+     */
     fun getTextFromClipboard(context: Context): String {
         val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clipData = clipboard.primaryClip
@@ -113,20 +130,26 @@ object AndroidUtils {
         }
     }
 
-    //清空粘贴板
+    /**
+     * 清空粘贴板
+     */
     fun clearClipboard(context: Context) {
         val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val emptyClipData = ClipData.newPlainText("", "")
         clipboard.setPrimaryClip(emptyClipData)
     }
 
-    //隐藏软键盘
+    /**
+     * 隐藏软键盘
+     */
     fun hideKeyboard(context: Context, view: View) {
         val imm = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    //判断是否为黑暗模式
+    /**
+     * 判断是否为黑暗模式
+     */
     fun isDarkMode(context: Context): Boolean {
         return when (AppCompatDelegate.getDefaultNightMode()) {
             AppCompatDelegate.MODE_NIGHT_NO -> false
@@ -135,21 +158,27 @@ object AndroidUtils {
         }
     }
 
-    //获取内部存储空间
+    /**
+     * 获取内部存储空间总大小
+     */
     fun getTotalInternalStorage(): Long {
         val path = Environment.getDataDirectory()
         val stat = StatFs(path.path)
         return stat.blockCountLong * stat.blockSizeLong
     }
 
-    //获取内部可用存储空间
+    /**
+     * 获取内部可用存储空间大小
+     */
     fun getAvailableInternalStorageSize(): Long {
         val path = Environment.getDataDirectory()
         val stat = StatFs(path.path)
         return stat.availableBlocksLong * stat.blockSizeLong
     }
 
-    //分享文件
+    /**
+     * 分享文件
+     */
     fun shareFile(context: Context, path: String?) {
         if (path.isNullOrEmpty()) return
 
@@ -188,25 +217,13 @@ object AndroidUtils {
         context.startActivity(chooserIntent)
     }
 
-    //打开网址
+    /**
+     * 打开网址
+     */
     fun openUrl(context: Context, url: String?) {
         val intent = Intent(Intent.ACTION_VIEW)
         intent.data = url?.toUri()
         context.startActivity(intent)
-    }
-
-    //在文件名的最后 拼接上时间戳 保证唯一性
-    fun appendTimestampToFilename(filename: String): String {
-        val dotIndex = filename.lastIndexOf('.')
-        val timestamp = System.currentTimeMillis()
-
-        return if (dotIndex != -1) {
-            val name = filename.substring(0, dotIndex)
-            val extension = filename.substring(dotIndex)
-            "${name}_$timestamp$extension"
-        } else {
-            "${filename}_$timestamp"
-        }
     }
 
 }

@@ -29,6 +29,7 @@ import com.example.downloader.model.VideoTask
 import com.example.downloader.model.eventbus.AddHistoryMessage
 import com.example.downloader.model.eventbus.UrlMessage
 import com.example.lib.utils.AndroidUtils
+import com.example.lib.utils.FileUtils
 import com.example.lib.utils.StringUtils
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.Dispatchers
@@ -282,7 +283,7 @@ class DownloadFragment : Fragment() {
                             val targetFile =
                                 File(
                                     sourceFile.parentFile!!.parent!!,
-                                    AndroidUtils.appendTimestampToFilename(sourceFile.name)
+                                    FileUtils.appendTimestampToFilename(sourceFile.name)
                                 )
                             sourceFile.renameTo(targetFile)
 
@@ -346,7 +347,7 @@ class DownloadFragment : Fragment() {
                         val targetFile =
                             File(
                                 sourceFile.parentFile!!.parent!!,
-                                AndroidUtils.appendTimestampToFilename(sourceFile.name)
+                                FileUtils.appendTimestampToFilename(sourceFile.name)
                             )
                         sourceFile.renameTo(targetFile)
 
