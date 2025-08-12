@@ -38,7 +38,7 @@ import java.util.Locale
 import kotlin.math.min
 
 // TODO: 这个页面可以增加一个恢复按钮
-/*
+/**
 需要原图centerCrop，大图fitCenter
  */
 class PhotoViewFragment() : Fragment() {
@@ -82,7 +82,9 @@ class PhotoViewFragment() : Fragment() {
 
     interface Listener {
         fun showPhoto(imageView: ImageView, index: Int)
-        fun scrollToPosition(position: Int)
+        fun getRecyclerView(): RecyclerView
+        fun getUri(position: Int): Uri?
+        fun getImageView(position: Int): ImageView?
     }
 
     private lateinit var mListener: Listener
@@ -90,7 +92,8 @@ class PhotoViewFragment() : Fragment() {
     private lateinit var mTitleBar: View
     private lateinit var mMainView: View
     private lateinit var mTranslationImageView: ImageView
-    private var mIsAnimating = false
+    private var mIsChangeBackgroundAnimating = false
+    private var mIsEnterAnimating = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -123,7 +126,7 @@ class PhotoViewFragment() : Fragment() {
         }
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                doExit()
+                doClose()
             }
         })
     }
@@ -218,54 +221,63 @@ class PhotoViewFragment() : Fragment() {
         }
 
         view.findViewById<Button>(R.id.btn_back).setOnClickListener {
-            doExit()
+            doClose()
         }
     }
 
-    private fun doExit() {
-        mListener.scrollToPosition(mViewpager.currentItem)
-    }
-
-    private fun close() {
+    private fun removeFragment() {
         getParentFragmentManager()
             .beginTransaction()
             .remove(this@PhotoViewFragment)
             .commit()
     }
 
-    fun doPreClose(
-        uri: Uri?,
-        imageView: ImageView
-    ) {
-        val (sourceWidth, sourceHeight) = if (uri == null) {
-            close()
-            return
-        } else {
-            AndroidUtils.getImageSizeFromUri(imageView.context, uri) ?: (0 to 0)
-        }
-
-        if (sourceWidth == 0 || sourceHeight == 0) {
-            close()
+    private fun doClose() {
+        if (mIsEnterAnimating) {
             return
         }
+        val position = mViewpager.currentItem
+        val recyclerView = mListener.getRecyclerView()
+        recyclerView.scrollToPosition(position)
+        recyclerView.post {
+            val uri = mListener.getUri(position)
+            val imageView = mListener.getImageView(position)
 
-        val location = IntArray(2).apply {
-            imageView.getLocationOnScreen(this)
+            if (imageView == null) {
+                removeFragment()
+                return@post
+            }
+            val (sourceWidth, sourceHeight) = if (uri == null) {
+                removeFragment()
+                return@post
+            } else {
+                AndroidUtils.getImageSizeFromUri(imageView.context, uri) ?: (0 to 0)
+            }
+
+            if (sourceWidth == 0 || sourceHeight == 0) {
+                removeFragment()
+                return@post
+            }
+
+            val location = IntArray(2).apply {
+                imageView.getLocationOnScreen(this)
+            }
+
+            doExitAnimator(
+                location[0],
+                location[1],
+                imageView.width,
+                imageView.height,
+                sourceWidth,
+                sourceHeight,
+                uri
+            )
+
         }
-
-        doExitAnimator(
-            location[0],
-            location[1],
-            imageView.width,
-            imageView.height,
-            sourceWidth,
-            sourceHeight,
-            uri
-        )
     }
 
     private fun doBackgroundChangeAnimator() {
-        if (mIsAnimating) {
+        if (mIsChangeBackgroundAnimating) {
             return
         }
         val animatorSet = AnimatorSet()
@@ -297,12 +309,12 @@ class PhotoViewFragment() : Fragment() {
             animatorSet.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
-                    mIsAnimating = true
+                    mIsChangeBackgroundAnimating = true
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
-                    mIsAnimating = false
+                    mIsChangeBackgroundAnimating = false
                     mTitleBar.visibility = View.INVISIBLE
                 }
             })
@@ -334,13 +346,18 @@ class PhotoViewFragment() : Fragment() {
             animatorSet.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
-                    mIsAnimating = true
+                    mIsChangeBackgroundAnimating = true
                     mTitleBar.visibility = View.VISIBLE
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
-                    mIsAnimating = false
+                    mIsChangeBackgroundAnimating = false
+                }
+
+                override fun onAnimationCancel(animation: Animator) {
+                    super.onAnimationCancel(animation)
+                    mIsChangeBackgroundAnimating = false
                 }
             })
         }
@@ -439,6 +456,7 @@ class PhotoViewFragment() : Fragment() {
         animatorSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationStart(animation: Animator) {
                 super.onAnimationStart(animation)
+                mIsEnterAnimating = true
             }
 
             override fun onAnimationEnd(animation: Animator) {
@@ -451,6 +469,22 @@ class PhotoViewFragment() : Fragment() {
                 mTranslationImageView.scaleY = 1f
                 mTranslationImageView.translationX = 0f
                 mTranslationImageView.translationY = 0f
+
+                mIsEnterAnimating = false
+            }
+
+            override fun onAnimationCancel(animation: Animator) {
+                super.onAnimationCancel(animation)
+                mViewpager.visibility = View.VISIBLE
+                mTranslationImageView.visibility = View.INVISIBLE
+
+                //重置mTranslationImageView的状态
+                mTranslationImageView.scaleX = 1f
+                mTranslationImageView.scaleY = 1f
+                mTranslationImageView.translationX = 0f
+                mTranslationImageView.translationY = 0f
+
+                mIsEnterAnimating = false
             }
         })
         animatorSet.start()
@@ -572,13 +606,14 @@ class PhotoViewFragment() : Fragment() {
             clipBoundAnimator
         )
         animatorSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationStart(animation: Animator) {
-                super.onAnimationStart(animation)
-            }
-
             override fun onAnimationEnd(animation: Animator) {
                 super.onAnimationEnd(animation)
-                close()
+                removeFragment()
+            }
+
+            override fun onAnimationCancel(animation: Animator) {
+                super.onAnimationCancel(animation)
+                removeFragment()
             }
         })
         animatorSet.start()

@@ -1,6 +1,7 @@
 package com.example.swipeclean.activity
 
 import android.content.res.Resources
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
@@ -114,17 +115,20 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
             .into(imageView)
     }
 
-    override fun scrollToPosition(position: Int) {
-        mRecyclerView.scrollToPosition(position)
-        mRecyclerView.post {
-            val holder = mRecyclerView.findViewHolderForAdapterPosition(position)
-            if (holder is RecyclerBinAdapter.MyViewHolder) {
-                val fragment =
-                    supportFragmentManager.findFragmentByTag(PhotoViewFragment.TAG_FRAGMENT)
-                if (fragment is PhotoViewFragment) {
-                    fragment.doPreClose(mAdapter.photos[position].sourceUri, holder.photoImageView)
-                }
-            }
+    override fun getRecyclerView(): RecyclerView {
+        return mRecyclerView
+    }
+
+    override fun getUri(position: Int): Uri? {
+        return mAdapter.photos[position].sourceUri
+    }
+
+    override fun getImageView(position: Int): ImageView? {
+        val holder = mRecyclerView.findViewHolderForAdapterPosition(position)
+        return if (holder is RecyclerBinAdapter.MyViewHolder) {
+            holder.photoImageView
+        } else {
+            null
         }
     }
 
