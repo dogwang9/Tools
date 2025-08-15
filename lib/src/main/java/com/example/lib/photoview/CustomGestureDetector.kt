@@ -11,6 +11,7 @@ import kotlin.Boolean
 import kotlin.Exception
 import kotlin.IllegalArgumentException
 import kotlin.Int
+import kotlin.let
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
@@ -113,9 +114,7 @@ class CustomGestureDetector(context: Context, listener: OnGestureListener) {
                 mActivePointerId = ev.getPointerId(0)
 
                 mVelocityTracker = VelocityTracker.obtain()
-                if (null != mVelocityTracker) {
-                    mVelocityTracker!!.addMovement(ev)
-                }
+                mVelocityTracker?.addMovement(ev)
 
                 mLastTouchX = getActiveX(ev)
                 mLastTouchY = getActiveY(ev)
@@ -139,17 +138,15 @@ class CustomGestureDetector(context: Context, listener: OnGestureListener) {
                     mLastTouchX = x
                     mLastTouchY = y
 
-                    if (null != mVelocityTracker) {
-                        mVelocityTracker!!.addMovement(ev)
-                    }
+                    mVelocityTracker?.addMovement(ev)
                 }
             }
 
             MotionEvent.ACTION_CANCEL -> {
                 mActivePointerId = INVALID_POINTER_ID
                 // Recycle Velocity Tracker
-                if (null != mVelocityTracker) {
-                    mVelocityTracker!!.recycle()
+                mVelocityTracker?.let {
+                    it.recycle()
                     mVelocityTracker = null
                 }
             }
@@ -157,17 +154,16 @@ class CustomGestureDetector(context: Context, listener: OnGestureListener) {
             MotionEvent.ACTION_UP -> {
                 mActivePointerId = INVALID_POINTER_ID
                 if (mIsDragging) {
-                    if (null != mVelocityTracker) {
+                    mVelocityTracker?.let {
                         mLastTouchX = getActiveX(ev)
                         mLastTouchY = getActiveY(ev)
 
                         // Compute velocity within the last 1000ms
-                        mVelocityTracker!!.addMovement(ev)
-                        mVelocityTracker!!.computeCurrentVelocity(1000)
+                        it.addMovement(ev)
+                        it.computeCurrentVelocity(1000)
 
-                        val vX = mVelocityTracker!!.xVelocity
-                        val vY = mVelocityTracker!!
-                            .yVelocity
+                        val vX = it.xVelocity
+                        val vY = it.yVelocity
 
                         // If the velocity is greater than minVelocity, call
                         // listener
@@ -181,8 +177,8 @@ class CustomGestureDetector(context: Context, listener: OnGestureListener) {
                 }
 
                 // Recycle Velocity Tracker
-                if (null != mVelocityTracker) {
-                    mVelocityTracker!!.recycle()
+                mVelocityTracker?.let {
+                    it.recycle()
                     mVelocityTracker = null
                 }
             }

@@ -93,9 +93,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
                     if (mScaleDragDetector!!.isScaling()) {
                         return  // Do not drag if we are already scaling
                     }
-                    if (mOnViewDragListener != null) {
-                        mOnViewDragListener!!.onDrag(dx, dy)
-                    }
+                    mOnViewDragListener?.onDrag(dx, dy)
                     mSuppMatrix.postTranslate(dx, dy)
                     checkAndDisplayMatrix()
 
@@ -109,7 +107,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
                      * the edge, aka 'overscrolling', let the parent take over).
                      */
                     val parent = mImageView.parent
-                    if (mAllowParentInterceptOnEdge && !mScaleDragDetector!!.isScaling() && !mBlockParentIntercept) {
+                    if (mAllowParentInterceptOnEdge && !mBlockParentIntercept) {
                         if (mHorizontalScrollEdge == HORIZONTAL_EDGE_BOTH || (mHorizontalScrollEdge == HORIZONTAL_EDGE_LEFT && dx >= 1f)
                             || (mHorizontalScrollEdge == HORIZONTAL_EDGE_RIGHT && dx <= -1f)
                             || (mVerticalScrollEdge == VERTICAL_EDGE_TOP && dy >= 1f)
@@ -148,9 +146,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
                     dy: Float
                 ) {
                     if (getScale() < mMaxScale || scaleFactor < 1f) {
-                        if (mScaleChangeListener != null) {
-                            mScaleChangeListener!!.onScaleChange(scaleFactor, focusX, focusY)
-                        }
+                        mScaleChangeListener?.onScaleChange(scaleFactor, focusX, focusY)
                         mSuppMatrix.postScale(scaleFactor, scaleFactor, focusX, focusY)
                         mSuppMatrix.postTranslate(dx, dy)
                         checkAndDisplayMatrix()
@@ -163,9 +159,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
                 GestureDetector(mImageView.context, object : SimpleOnGestureListener() {
                     // forward long click listener
                     override fun onLongPress(e: MotionEvent) {
-                        if (mLongClickListener != null) {
-                            mLongClickListener!!.onLongClick(mImageView)
-                        }
+                        mLongClickListener?.onLongClick(mImageView)
                     }
 
                     override fun onFling(
@@ -174,7 +168,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
                         velocityX: Float,
                         velocityY: Float
                     ): Boolean {
-                        if (mSingleFlingListener != null) {
+                        mSingleFlingListener?.let {
                             if (getScale() > DEFAULT_MIN_SCALE) {
                                 return false
                             }
@@ -196,24 +190,17 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
                     val displayRect: RectF? = getDisplayRect()
                     val x = e.x
                     val y = e.y
-                    if (mViewTapListener != null) {
-                        mViewTapListener!!.onViewTap(mImageView, x, y)
-                    }
-                    if (displayRect != null) {
-                        // Check to see if the user tapped on the photo
+                    mViewTapListener?.onViewTap(mImageView, x, y)
+                    displayRect?.let {
                         if (displayRect.contains(x, y)) {
                             val xResult = ((x - displayRect.left)
                                     / displayRect.width())
                             val yResult = ((y - displayRect.top)
                                     / displayRect.height())
-                            if (mPhotoTapListener != null) {
-                                mPhotoTapListener!!.onPhotoTap(mImageView, xResult, yResult)
-                            }
+                            mPhotoTapListener?.onPhotoTap(mImageView, xResult, yResult)
                             return true
                         } else {
-                            if (mOutsidePhotoTapListener != null) {
-                                mOutsidePhotoTapListener!!.onOutsidePhotoTap(mImageView)
-                            }
+                            mOutsidePhotoTapListener?.onOutsidePhotoTap(mImageView)
                         }
                     }
                     return false
@@ -231,7 +218,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
                         } else {
                             setScale(getMinimumScale(), x, y, true)
                         }
-                    } catch (e: ArrayIndexOutOfBoundsException) {
+                    } catch (_: ArrayIndexOutOfBoundsException) {
                         // Can sometimes happen when getX() and getY() is called
                     }
                     return true
@@ -269,7 +256,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
 
     fun setDisplayMatrix(finalMatrix: Matrix): Boolean {
         requireNotNull(finalMatrix) { "Matrix cannot be null" }
-        if (mImageView!!.getDrawable() == null) {
+        if (mImageView.getDrawable() == null) {
             return false
         }
         mSuppMatrix.set(finalMatrix)
@@ -306,7 +293,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
         return mMaxScale
     }
 
-    public fun getScale(): Float {
+    fun getScale(): Float {
         return sqrt(
             (getValue(mSuppMatrix, Matrix.MSCALE_X).toDouble().pow(2.0).toFloat() + getValue(
                 mSuppMatrix,
@@ -355,7 +342,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
                     // to min scale
                     if (getScale() < mMinScale) {
                         val rect = getDisplayRect()
-                        if (rect != null) {
+                        rect?.let {
                             v.post(
                                 AnimatedZoomRunnable(
                                     getScale(), mMinScale,
@@ -366,7 +353,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
                         }
                     } else if (getScale() > mMaxScale) {
                         val rect = getDisplayRect()
-                        if (rect != null) {
+                        rect?.let {
                             v.post(
                                 AnimatedZoomRunnable(
                                     getScale(), mMaxScale,
@@ -572,12 +559,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
     private fun setImageViewMatrix(matrix: Matrix) {
         mImageView.setImageMatrix(matrix)
         // Call MatrixChangedListener if needed
-        if (mMatrixChangeListener != null) {
-            val displayRect = getDisplayRect(matrix)
-            if (displayRect != null) {
-                mMatrixChangeListener!!.onMatrixChanged(displayRect)
-            }
-        }
+        mMatrixChangeListener?.onMatrixChanged(getDisplayRect(matrix))
     }
 
     /**
@@ -597,7 +579,7 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
      */
     private fun getDisplayRect(matrix: Matrix): RectF? {
         val d = mImageView.getDrawable()
-        if (d != null) {
+        d?.let {
             mDisplayRect.set(
                 0f, 0f, d.intrinsicWidth.toFloat(),
                 d.intrinsicHeight.toFloat()
@@ -624,57 +606,65 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
         mBaseMatrix.reset()
         val widthScale = viewWidth / drawableWidth
         val heightScale = viewHeight / drawableHeight
-        if (mScaleType == ScaleType.CENTER) {
-            mBaseMatrix.postTranslate(
-                (viewWidth - drawableWidth) / 2f,
-                (viewHeight - drawableHeight) / 2f
-            )
-        } else if (mScaleType == ScaleType.CENTER_CROP) {
-            val scale = max(widthScale, heightScale)
-            mBaseMatrix.postScale(scale, scale)
-            mBaseMatrix.postTranslate(
-                (viewWidth - drawableWidth * scale) / 2f,
-                (viewHeight - drawableHeight * scale) / 2f
-            )
-        } else if (mScaleType == ScaleType.CENTER_INSIDE) {
-            val scale = min(1.0f, min(widthScale, heightScale))
-            mBaseMatrix.postScale(scale, scale)
-            mBaseMatrix.postTranslate(
-                (viewWidth - drawableWidth * scale) / 2f,
-                (viewHeight - drawableHeight * scale) / 2f
-            )
-        } else {
-            var mTempSrc = RectF(0f, 0f, drawableWidth.toFloat(), drawableHeight.toFloat())
-            val mTempDst = RectF(0f, 0f, viewWidth, viewHeight)
-            if (mBaseRotation.toInt() % 180 != 0) {
-                mTempSrc = RectF(0f, 0f, drawableHeight.toFloat(), drawableWidth.toFloat())
+        when (mScaleType) {
+            ScaleType.CENTER -> {
+                mBaseMatrix.postTranslate(
+                    (viewWidth - drawableWidth) / 2f,
+                    (viewHeight - drawableHeight) / 2f
+                )
             }
-            when (mScaleType) {
-                ScaleType.FIT_CENTER -> mBaseMatrix.setRectToRect(
-                    mTempSrc,
-                    mTempDst,
-                    Matrix.ScaleToFit.CENTER
-                )
 
-                ScaleType.FIT_START -> mBaseMatrix.setRectToRect(
-                    mTempSrc,
-                    mTempDst,
-                    Matrix.ScaleToFit.START
+            ScaleType.CENTER_CROP -> {
+                val scale = max(widthScale, heightScale)
+                mBaseMatrix.postScale(scale, scale)
+                mBaseMatrix.postTranslate(
+                    (viewWidth - drawableWidth * scale) / 2f,
+                    (viewHeight - drawableHeight * scale) / 2f
                 )
+            }
 
-                ScaleType.FIT_END -> mBaseMatrix.setRectToRect(
-                    mTempSrc,
-                    mTempDst,
-                    Matrix.ScaleToFit.END
+            ScaleType.CENTER_INSIDE -> {
+                val scale = min(1.0f, min(widthScale, heightScale))
+                mBaseMatrix.postScale(scale, scale)
+                mBaseMatrix.postTranslate(
+                    (viewWidth - drawableWidth * scale) / 2f,
+                    (viewHeight - drawableHeight * scale) / 2f
                 )
+            }
 
-                ScaleType.FIT_XY -> mBaseMatrix.setRectToRect(
-                    mTempSrc,
-                    mTempDst,
-                    Matrix.ScaleToFit.FILL
-                )
+            else -> {
+                var mTempSrc = RectF(0f, 0f, drawableWidth.toFloat(), drawableHeight.toFloat())
+                val mTempDst = RectF(0f, 0f, viewWidth, viewHeight)
+                if (mBaseRotation.toInt() % 180 != 0) {
+                    mTempSrc = RectF(0f, 0f, drawableHeight.toFloat(), drawableWidth.toFloat())
+                }
+                when (mScaleType) {
+                    ScaleType.FIT_CENTER -> mBaseMatrix.setRectToRect(
+                        mTempSrc,
+                        mTempDst,
+                        Matrix.ScaleToFit.CENTER
+                    )
 
-                else -> {}
+                    ScaleType.FIT_START -> mBaseMatrix.setRectToRect(
+                        mTempSrc,
+                        mTempDst,
+                        Matrix.ScaleToFit.START
+                    )
+
+                    ScaleType.FIT_END -> mBaseMatrix.setRectToRect(
+                        mTempSrc,
+                        mTempDst,
+                        Matrix.ScaleToFit.END
+                    )
+
+                    ScaleType.FIT_XY -> mBaseMatrix.setRectToRect(
+                        mTempSrc,
+                        mTempDst,
+                        Matrix.ScaleToFit.FILL
+                    )
+
+                    else -> {}
+                }
             }
         }
         resetMatrix()
@@ -691,10 +681,10 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
         var deltaY = 0f
         val viewHeight = getImageViewHeight(mImageView)
         if (height <= viewHeight) {
-            when (mScaleType) {
-                ScaleType.FIT_START -> deltaY = -rect.top
-                ScaleType.FIT_END -> deltaY = viewHeight - height - rect.top
-                else -> deltaY = (viewHeight - height) / 2 - rect.top
+            deltaY = when (mScaleType) {
+                ScaleType.FIT_START -> -rect.top
+                ScaleType.FIT_END -> viewHeight - height - rect.top
+                else -> (viewHeight - height) / 2 - rect.top
             }
             mVerticalScrollEdge = VERTICAL_EDGE_BOTH
         } else if (rect.top > 0) {
@@ -708,10 +698,10 @@ class PhotoViewAttacher(val mImageView: ImageView) : OnTouchListener,
         }
         val viewWidth = getImageViewWidth(mImageView)
         if (width <= viewWidth) {
-            when (mScaleType) {
-                ScaleType.FIT_START -> deltaX = -rect.left
-                ScaleType.FIT_END -> deltaX = viewWidth - width - rect.left
-                else -> deltaX = (viewWidth - width) / 2 - rect.left
+            deltaX = when (mScaleType) {
+                ScaleType.FIT_START -> -rect.left
+                ScaleType.FIT_END -> viewWidth - width - rect.left
+                else -> (viewWidth - width) / 2 - rect.left
             }
             mHorizontalScrollEdge = HORIZONTAL_EDGE_BOTH
         } else if (rect.left > 0) {
