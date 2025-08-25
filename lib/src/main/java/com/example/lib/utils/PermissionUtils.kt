@@ -10,6 +10,7 @@ import android.os.Build
 import android.provider.Settings
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 
 object PermissionUtils {
@@ -82,5 +83,56 @@ object PermissionUtils {
             context,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    /**
+     * 检查通知权限
+     */
+    fun checkNotificationPermission(context: Context): Boolean {
+        return NotificationManagerCompat.from(context).areNotificationsEnabled()
+    }
+
+    /**
+     * 获取通知权限
+     */
+    fun getNotificationPermission(
+        activity: Activity,
+        launcher1: ActivityResultLauncher<String>,
+        launcher2: ActivityResultLauncher<Intent>
+    ) {
+        if (checkNotificationPermission(activity)) {
+            return
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permission = Manifest.permission.POST_NOTIFICATIONS
+            // 当用户多次点击不在询问(一般是两次),授权界面就不再会出现
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+                launcher1.launch(permission)
+
+            } else {
+                getPermissionByIntent(activity, launcher2)
+            }
+
+        } else {
+            getPermissionByIntent(activity, launcher2)
+        }
+    }
+
+    private fun getPermissionByIntent(
+        activity: Activity,
+        launcher: ActivityResultLauncher<Intent>
+    ) {
+        //api 26之后可以直接跳转到app的通知权限界面，之前只能跳转到app所有权限界面
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
+            }
+        } else {
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", activity.packageName, null)
+            }
+        }
+        launcher.launch(intent)
     }
 }
