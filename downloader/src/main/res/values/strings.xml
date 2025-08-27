@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Downloader</string>
 
+    <string name="suggestion">Suggestion</string>
     <string name="tab_download">Download</string>
     <string name="tab_history">History</string>
     <string name="url_is_empty">Url is empty</string>
@@ -15,8 +16,11 @@
     <string name="delete">Delete</string>
     <string name="share">Share</string>
     <string name="all">All</string>
+    <string name="cancel">Cancel</string>
+    <string name="grant">Grant</string>
     <string name="re_download">Re-download</string>
     <string name="insufficient_storage_space">Insufficient storage space</string>
     <string name="download_success">download success</string>
     <string name="download_failed">download failed</string>
+    <string name="suggest_grant_notification_permission">Turn on the notification for more stable downloading</string>
 </resources>

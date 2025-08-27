@@ -21,6 +21,7 @@ import com.example.downloader.service.DownloadService
 import com.example.lib.utils.AndroidUtils
 import com.example.lib.utils.PermissionUtils
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.greenrobot.eventbus.EventBus
 
 
@@ -48,7 +49,14 @@ class MainActivity : AppCompatActivity() {
                 this
             )
         ) {
-            PermissionUtils.getNotificationPermission(this, mLauncher1, mLauncher2)
+            MaterialAlertDialogBuilder(this@MainActivity)
+                .setTitle(R.string.suggestion)
+                .setMessage(R.string.suggest_grant_notification_permission)
+                .setNegativeButton(R.string.cancel) { dialog, which -> }
+                .setPositiveButton(R.string.grant) { dialog, which ->
+                    PermissionUtils.getNotificationPermission(this, mLauncher1, mLauncher2)
+                }
+                .show()
         }
 
         // 点击通知后触发清理已完成的通知
