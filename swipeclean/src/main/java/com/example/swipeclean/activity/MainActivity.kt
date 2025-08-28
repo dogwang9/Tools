@@ -110,13 +110,13 @@ class MainActivity : AppCompatActivity() {
         if (!PermissionUtils.checkReadImagePermission(this)
         ) {
             MaterialAlertDialogBuilder(this)
-                .setTitle("请授权")
-                .setMessage("授权以访问设备上的图片")
+                .setTitle(R.string.dialog_reminder)
+                .setMessage(R.string.dialog_notification_message)
                 .setCancelable(false)
-                .setNegativeButton("关闭") { dialog, which ->
+                .setNegativeButton(R.string.cancel) { dialog, which ->
                     finish()
                 }
-                .setPositiveButton("去授权") { dialog, which ->
+                .setPositiveButton(R.string.grant_permission) { dialog, which ->
                     PermissionUtils.getReadImagePermission(this, mPermissionLauncher)
                 }
                 .show()
@@ -163,10 +163,10 @@ class MainActivity : AppCompatActivity() {
                                     if (completed) {
                                         MaterialAlertDialogBuilder(this@MainActivity)
                                             .setTitle(albumFormatDate)
-                                            .setMessage("要再次清理此文件夹中的图片吗")
+                                            .setMessage(R.string.dialog_clean_album_again_message)
                                             .setCancelable(false)
-                                            .setNegativeButton("取消") { dialog, which -> }
-                                            .setPositiveButton("确认") { dialog, which ->
+                                            .setNegativeButton(R.string.cancel) { dialog, which -> }
+                                            .setPositiveButton(R.string.clean) { dialog, which ->
                                                 val album: Album? =
                                                     AlbumController.getAlbums()
                                                         .find { it.getId() == albumId }

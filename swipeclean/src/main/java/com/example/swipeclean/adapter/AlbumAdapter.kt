@@ -13,7 +13,6 @@ import com.example.swipeclean.adapter.AlbumAdapter.MyViewHolder
 import com.example.swipeclean.model.Album
 import com.example.swipeclean.view.DualProgressIndicator
 import com.example.tools.R
-import java.util.Locale
 
 class AlbumAdapter(
     val albums: ArrayList<Album>,
@@ -47,8 +46,12 @@ class AlbumAdapter(
         val operatedCount = album.getOperatedIndex()
 
         holder.dateTextView.text = album.formatData
-        holder.progressTextView.text =
-            String.format(Locale.getDefault(), "%d/%d %s", completedCunt, totalCount, "张照片")
+        holder.progressTextView.text = context.resources.getQuantityString(
+            R.plurals.picture_progress,
+            totalCount,
+            completedCunt,
+            totalCount
+        )
         holder.progressIndicator.setProgress(100 * operatedCount / totalCount)
         holder.progressIndicator.setSecondaryProgress(100 * completedCunt / totalCount)
 

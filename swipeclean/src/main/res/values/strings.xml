@@ -1,3 +1,40 @@
 <resources>
-    <string name="app_name">滑动清理</string>
+    <string name="app_name">Swipe Clean</string>
+    <string name="dialog_reminder">Reminder</string>
+    <string name="cancel">Cancel</string>
+    <string name="clean">Clean</string>
+    <string name="cleaned">Cleaned</string>
+    <string name="complete">Complete</string>
+    <string name="completed">completed</string>
+    <string name="delete">Delete</string>
+    <string name="to_be_delete">To be deleted</string>
+    <string name="no_pictures">No pictures</string>
+    <string name="no_pictures_notice">It seems that you don\'t have any photos to display here yet</string>
+    <string name="all_restore">All restored</string>
+    <string name="clear_trash_bin">Clear trash bin</string>
+    <string name="great">Great!</string>
+    <string name="release">Release</string>
+    <string name="sort">Sort</string>
+    <string name="date">Date</string>
+    <string name="size">Size</string>
+    <string name="unfinished">Unfinished</string>
+    <string name="space_optimized">Your space has been optimized!</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="delete_picture">Delete pictures</string>
+    <string name="trash_bin_size">Trash bin (%s)</string>
+    <plurals name="open_trash_bin_picture_count">
+        <item quantity="one">Open trash bin (%d picture)</item>
+        <item quantity="other">Open trash bin (%d pictures)</item>
+    </plurals>
+    <plurals name="picture_count">
+        <item quantity="one">%d picture</item>
+        <item quantity="other">%d pictures</item>
+    </plurals>
+    <plurals name="picture_progress">
+        <item quantity="one">%d/%d picture</item>
+        <item quantity="other">%d/%d pictures</item>
+    </plurals>
+    <string name="dialog_notification_message">Authorize to access the pictures on the device</string>
+    <string name="dialog_clean_album_again_message">Do you want to clean up the pictures in this folder again?</string>
+    <string name="dialog_delete_picture_message">Once deleted, the picture cannot be restored</string>
 </resources>

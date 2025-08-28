@@ -196,12 +196,7 @@ class OperationActivity : AppCompatActivity() {
             val deleteCount: Int =
                 it.photos.stream().filter { item -> item.isDelete() }.count().toInt()
             mTrashButton.isEnabled = deleteCount != 0
-            mTrashButton.text =
-                String.format(
-                    Locale.getDefault(),
-                    "打开垃圾箱 (%d张照片) ",
-                    deleteCount
-                )
+            mTrashButton.text = resources.getQuantityString(R.plurals.open_trash_bin_picture_count,deleteCount,deleteCount)
         }
     }
 

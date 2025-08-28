@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:text="滑动清理"
+            android:text="@string/app_name"
             android:textColor="@color/text_main"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -79,7 +79,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginBottom="2dp"
-                    android:text="已清理"
+                    android:text="@string/cleaned"
                     android:textColor="@color/text_main"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toTopOf="@id/tv_cleaned_content"
@@ -138,7 +138,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="2dp"
-                    android:text="已完成"
+                    android:text="@string/completed"
                     android:textColor="@color/text_main"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toTopOf="@id/tv_completed_content"
@@ -174,7 +174,7 @@
             app:layout_constraintTop_toBottomOf="@+id/v_cleaned"
             tools:visibility="visible">
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_completed_progress"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
@@ -190,14 +190,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="已完成"
+                android:text="@string/completed"
                 android:textColor="@color/text_main"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@+id/iv_completed_progress"
                 app:layout_constraintStart_toEndOf="@+id/iv_completed_progress"
                 app:layout_constraintTop_toTopOf="@+id/iv_completed_progress" />
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_deleted_progress"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
@@ -212,7 +212,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="待删除"
+                android:text="@string/to_be_delete"
                 android:textColor="@color/text_main"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@+id/iv_deleted_progress"
@@ -259,7 +259,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="没有照片"
+                android:text="@string/no_pictures"
                 android:textColor="@color/text_main"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -274,7 +274,7 @@
                 android:layout_marginTop="4dp"
                 android:gravity="center"
                 android:maxWidth="214dp"
-                android:text="好像你还没有照片可以在这里显示"
+                android:text="@string/no_pictures_notice"
                 android:textColor="@color/text_sub"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"

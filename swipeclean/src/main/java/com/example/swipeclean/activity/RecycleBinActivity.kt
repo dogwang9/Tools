@@ -40,7 +40,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Collections
-import java.util.Locale
 
 class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
     private lateinit var mRecyclerView: RecyclerView
@@ -188,10 +187,10 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
         mEmptyTrashButton.setOnClickListener {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 MaterialAlertDialogBuilder(this)
-                    .setTitle("删除图片")
-                    .setMessage("一旦删除，图像将无法恢复")
+                    .setTitle(R.string.delete_picture)
+                    .setMessage(R.string.dialog_delete_picture_message)
                     .setPositiveButton(
-                        "删除"
+                        R.string.delete
                     ) { _, _ ->
                         if (PermissionUtils.checkWritePermission(this)) {
                             useOldDelete()
@@ -200,7 +199,7 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
                             PermissionUtils.getWritePermission(this, oldDeleteLauncher)
                         }
                     }
-                    .setNegativeButton("取消") { _, _ -> }
+                    .setNegativeButton(R.string.cancel) { _, _ -> }
                     .show()
 
             } else {
@@ -242,12 +241,11 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
     private fun showDeleteResult() {
         (findViewById<TextView>(R.id.tv_free_up_size)!!).text =
             getHumanFriendlyByteCount(mAdapter.getTotalSize(), 1)
-        (findViewById<TextView>(R.id.tv_deleted_count)!!).text =
-            String.format(
-                Locale.getDefault(),
-                "%d张图片",
-                mAdapter.photos.size
-            )
+        (findViewById<TextView>(R.id.tv_deleted_count)!!).text = resources.getQuantityString(
+            R.plurals.picture_count,
+            mAdapter.photos.size,
+            mAdapter.photos.size
+        )
 
         findViewById<View>(R.id.v_trash_bin).visibility = View.GONE
         findViewById<View>(R.id.v_complete).visibility = View.VISIBLE
@@ -257,12 +255,8 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
     }
 
     private fun showTotalSize(totalSize: Long) {
-        mTitleTextView.text = String.format(
-            Locale.getDefault(),
-            "%s (%s)",
-            "垃圾箱",
-            getHumanFriendlyByteCount(totalSize, 1)
-        )
+        mTitleTextView.text =
+            getString(R.string.trash_bin_size, getHumanFriendlyByteCount(totalSize, 1))
     }
 
     private fun useOldDelete() {
