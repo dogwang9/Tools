@@ -29,7 +29,7 @@ import com.example.swipeclean.adapter.RecyclerBinAdapter
 import com.example.swipeclean.business.AlbumController
 import com.example.swipeclean.business.ConfigHost
 import com.example.swipeclean.model.Album
-import com.example.swipeclean.model.Photo
+import com.example.swipeclean.model.Image
 import com.example.swipeclean.other.Constants.KEY_INTENT_ALBUM_ID
 import com.example.swipeclean.other.Constants.MIN_SHOW_LOADING_TIME
 import com.example.tools.R
@@ -60,9 +60,9 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
                         mAdapter.getTotalSize(),
                         this@RecycleBinActivity
                     )
-                    mAdapter.photos.let {
-                        AlbumController.cleanCompletedPhoto(it)
-                        mAlbum?.photos?.removeAll(it)
+                    mAdapter.images.let {
+                        AlbumController.cleanCompletedImage(it)
+                        mAlbum?.images?.removeAll(it)
                     }
 
                     delay(MIN_SHOW_LOADING_TIME)
@@ -97,7 +97,7 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
             item.getId() == intent.getLongExtra(KEY_INTENT_ALBUM_ID, 0)
         }
 
-        showDeletedPhotos(mAlbum?.photos?.filter { item -> item.isDelete() })
+        showDeletedPhotos(mAlbum?.images?.filter { item -> item.isDelete() })
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
@@ -110,7 +110,7 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
     override fun showPhoto(imageView: ImageView, index: Int) {
         Glide
             .with(this)
-            .load(mAdapter.photos[index].sourceUri)
+            .load(mAdapter.images[index].sourceUri)
             .into(imageView)
     }
 
@@ -119,13 +119,13 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
     }
 
     override fun getUri(position: Int): Uri? {
-        return mAdapter.photos[position].sourceUri
+        return mAdapter.images[position].sourceUri
     }
 
     override fun getImageView(position: Int): ImageView? {
         val holder = mRecyclerView.findViewHolderForAdapterPosition(position)
         return if (holder is RecyclerBinAdapter.MyViewHolder) {
-            holder.photoImageView
+            holder.coverImageView
         } else {
             null
         }
@@ -142,24 +142,24 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
         mBackButton.setOnClickListener { finish() }
     }
 
-    private fun showDeletedPhotos(deletedPhotos: List<Photo>?) {
-        if (deletedPhotos.isNullOrEmpty()) {
+    private fun showDeletedPhotos(deletedImages: List<Image>?) {
+        if (deletedImages.isNullOrEmpty()) {
             finish()
             return
         }
-        Collections.reverse(deletedPhotos)
+        Collections.reverse(deletedImages)
         mAdapter = RecyclerBinAdapter(
-            deletedPhotos.toMutableList(),
+            deletedImages.toMutableList(),
             { photo, position ->
                 mAdapter.notifyItemRemoved(position)
-                mAdapter.removePhoto(photo)
+                mAdapter.removeImage(photo)
                 showTotalSize(mAdapter.getTotalSize())
                 photo.doKeep()
                 lifecycleScope.launch(Dispatchers.IO) {
-                    AlbumController.converseDeleteToKeepPhoto(photo)
+                    AlbumController.converseDeleteToKeepImage(photo)
                 }
 
-                if (mAdapter.photos.isEmpty()) {
+                if (mAdapter.images.isEmpty()) {
                     finish()
                 }
             }, { photoImageView, photo, position ->
@@ -167,7 +167,7 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
                     PhotoViewFragment.show(
                         this,
                         position,
-                        mAdapter.photos.size,
+                        mAdapter.images.size,
                         it,
                         photoImageView
                     )
@@ -207,7 +207,7 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
                     IntentSenderRequest.Builder(
                         MediaStore.createDeleteRequest(
                             contentResolver,
-                            mAdapter.photos.map { it.sourceUri }).intentSender
+                            mAdapter.images.map { it.sourceUri }).intentSender
                     ).build()
                 )
             }
@@ -219,8 +219,8 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
             showTotalSize(0)
             mRecyclerView.visibility = View.GONE
             lifecycleScope.launch(Dispatchers.IO) {
-                mAdapter.photos.let { photos ->
-                    AlbumController.converseDeleteToKeepPhoto(photos)
+                mAdapter.images.let { photos ->
+                    AlbumController.converseDeleteToKeepImage(photos)
                     photos.forEach { it.doKeep() }
                 }
 
@@ -243,8 +243,8 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
             getHumanFriendlyByteCount(mAdapter.getTotalSize(), 1)
         (findViewById<TextView>(R.id.tv_deleted_count)!!).text = resources.getQuantityString(
             R.plurals.picture_count,
-            mAdapter.photos.size,
-            mAdapter.photos.size
+            mAdapter.images.size,
+            mAdapter.images.size
         )
 
         findViewById<View>(R.id.v_trash_bin).visibility = View.GONE
@@ -267,9 +267,9 @@ class RecycleBinActivity : AppCompatActivity(), PhotoViewFragment.Listener {
                 this@RecycleBinActivity
             )
 
-            mAdapter.photos.let { deletePhotos ->
-                AlbumController.cleanCompletedPhoto(deletePhotos)
-                mAlbum?.photos?.removeAll(deletePhotos)
+            mAdapter.images.let { deletePhotos ->
+                AlbumController.cleanCompletedImage(deletePhotos)
+                mAlbum?.images?.removeAll(deletePhotos)
 
                 deletePhotos
                     .mapNotNull { it.sourceUri }

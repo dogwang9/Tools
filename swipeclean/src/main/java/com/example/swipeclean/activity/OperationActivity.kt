@@ -30,7 +30,7 @@ import com.bumptech.glide.Priority
 import com.example.lib.utils.AndroidUtils
 import com.example.swipeclean.business.AlbumController
 import com.example.swipeclean.model.Album
-import com.example.swipeclean.model.Photo
+import com.example.swipeclean.model.Image
 import com.example.swipeclean.other.Constants.KEY_INTENT_ALBUM_ID
 import com.example.tools.R
 import com.google.android.material.button.MaterialButton
@@ -154,20 +154,20 @@ class OperationActivity : AppCompatActivity() {
 
     private fun setPhotos() {
         mAlbum?.let {
-            setPhoto(mUpImageView, it.photos[it.getOperatedIndex()])
+            setPhoto(mUpImageView, it.images[it.getOperatedIndex()])
             val nextIndex = it.getOperatedIndex() + 1
             if (nextIndex == it.getTotalCount()) {
                 mDownImageView.visibility = View.GONE
 
             } else {
-                if (nextIndex < it.photos.size) {
-                    setPhoto(mDownImageView, it.photos[nextIndex])
+                if (nextIndex < it.images.size) {
+                    setPhoto(mDownImageView, it.images[nextIndex])
                 }
             }
         }
     }
 
-    private fun setPhoto(image: ImageView, photo: Photo) {
+    private fun setPhoto(image: ImageView, photo: Image) {
         Glide.with(this)
             .load(photo.sourceUri)
             .priority(Priority.HIGH)
@@ -185,7 +185,7 @@ class OperationActivity : AppCompatActivity() {
                     Locale.getDefault(),
                     "%d/%d",
                     completeCount + 1,
-                    it.photos.size
+                    it.images.size
                 )
             mCancelButton.isEnabled = completeCount != 0
         }
@@ -194,7 +194,7 @@ class OperationActivity : AppCompatActivity() {
     private fun refreshTrashButton() {
         mAlbum?.let {
             val deleteCount: Int =
-                it.photos.stream().filter { item -> item.isDelete() }.count().toInt()
+                it.images.stream().filter { item -> item.isDelete() }.count().toInt()
             mTrashButton.isEnabled = deleteCount != 0
             mTrashButton.text = resources.getQuantityString(R.plurals.open_trash_bin_picture_count,deleteCount,deleteCount)
         }
@@ -336,21 +336,21 @@ class OperationActivity : AppCompatActivity() {
             return
         }
 
-        var lastPhoto: Photo? = null
-        var currentPhoto: Photo? = null
+        var lastImage: Image? = null
+        var currentImage: Image? = null
 
         mAlbum?.apply {
-            lastPhoto = photos[getOperatedIndex() - 1]
-            currentPhoto = photos[getOperatedIndex()]
+            lastImage = images[getOperatedIndex() - 1]
+            currentImage = images[getOperatedIndex()]
         }
 
-        if (lastPhoto == null || currentPhoto == null) {
+        if (lastImage == null || currentImage == null) {
             return
         }
 
         mDownImageView.visibility = View.VISIBLE
-        setPhoto(mUpImageView, lastPhoto)
-        setPhoto(mDownImageView, currentPhoto)
+        setPhoto(mUpImageView, lastImage)
+        setPhoto(mDownImageView, currentImage)
 
         val scaleXAnimator = ObjectAnimator.ofFloat(
             mDownImageView,
@@ -365,7 +365,7 @@ class OperationActivity : AppCompatActivity() {
             DOWN_IMAGE_SCALE
         )
         val textAlphaAnimator = ObjectAnimator.ofFloat(
-            if (lastPhoto.isKeep()) mKeepTextView else mDeleteTextView,
+            if (lastImage.isKeep()) mKeepTextView else mDeleteTextView,
             View.ALPHA,
             1f,
             0f
@@ -373,7 +373,7 @@ class OperationActivity : AppCompatActivity() {
         val translateXAnimator = ObjectAnimator.ofFloat(
             mUpImageContainer,
             View.TRANSLATION_X,
-            (mScreenWidth * (if (lastPhoto.isKeep()) 1 else -1)).toFloat(),
+            (mScreenWidth * (if (lastImage.isKeep()) 1 else -1)).toFloat(),
             0f
         )
         val translateYAnimator =
@@ -382,7 +382,7 @@ class OperationActivity : AppCompatActivity() {
         val rotateAnimator = ObjectAnimator.ofFloat(
             mUpImageContainer,
             View.ROTATION,
-            (20 * (if (lastPhoto.isKeep()) 1 else -1)).toFloat(),
+            (20 * (if (lastImage.isKeep()) 1 else -1)).toFloat(),
             0f
         )
         val animatorSet = AnimatorSet()
@@ -417,36 +417,36 @@ class OperationActivity : AppCompatActivity() {
     }
 
     private fun doOnCompleted(operationType: Int) {
-        var photo: Photo? = null
+        var image: Image? = null
         mAlbum?.apply {
-            photo =
-                if (operationType == PHOTO_OPERATION_CANCEL) photos[getOperatedIndex() - 1] else photos[getOperatedIndex()]
+            image =
+                if (operationType == PHOTO_OPERATION_CANCEL) images[getOperatedIndex() - 1] else images[getOperatedIndex()]
         }
 
-        if (photo == null) {
+        if (image == null) {
             return
         }
 
         when (operationType) {
             PHOTO_OPERATION_CANCEL -> {
-                photo.cancelOperated()
+                image.cancelOperated()
                 lifecycleScope.launch(Dispatchers.IO) {
-                    AlbumController.cleanCompletedPhoto(photo)
+                    AlbumController.cleanCompletedImage(image)
                 }
                 refreshTrashButton()
             }
 
             PHOTO_OPERATION_KEEP -> {
-                photo.doKeep()
+                image.doKeep()
                 lifecycleScope.launch(Dispatchers.IO) {
-                    AlbumController.addPhoto(photo)
+                    AlbumController.addImage(image)
                 }
             }
 
             PHOTO_OPERATION_DELETE -> {
-                photo.doDelete()
+                image.doDelete()
                 lifecycleScope.launch(Dispatchers.IO) {
-                    AlbumController.addPhoto(photo)
+                    AlbumController.addImage(image)
                 }
                 refreshTrashButton()
             }
@@ -458,7 +458,7 @@ class OperationActivity : AppCompatActivity() {
         }
 
         mAlbum?.takeIf { it.isOperated() }?.let { album ->
-            if (album.photos.any { it.isDelete() }) {
+            if (album.images.any { it.isDelete() }) {
                 openTrashActivity()
             }
             finish()

@@ -6,7 +6,7 @@ import android.provider.MediaStore
 import androidx.annotation.WorkerThread
 import androidx.room.Room
 import com.example.swipeclean.model.Album
-import com.example.swipeclean.model.Photo
+import com.example.swipeclean.model.Image
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -14,14 +14,14 @@ object AlbumController {
 
     private lateinit var mAppContext: Context
     private lateinit var mAlbums: ArrayList<Album>
-    private lateinit var mPhotoDao: PhotoDao
+    private lateinit var mImageDao: ImageDao
 
     fun init(applicationContext: Context) {
         mAppContext = applicationContext
         mAlbums = ArrayList()
 
-        mPhotoDao = Room.databaseBuilder(applicationContext, PhotoDataBase::class.java, "PhotoDB")
-            .build().photoDao()
+        mImageDao = Room.databaseBuilder(applicationContext, ImageDataBase::class.java, "PictureDB")
+            .build().imageDao()
     }
 
     fun getAlbums(): List<Album> {
@@ -29,36 +29,36 @@ object AlbumController {
     }
 
     @WorkerThread
-    fun addPhoto(photo: Photo) {
-        mPhotoDao.insertPhoto(photo)
+    fun addImage(image: Image) {
+        mImageDao.insertImage(image)
     }
 
     @WorkerThread
-    fun cleanCompletedPhoto(photo: Photo) {
-        mPhotoDao.delete(photo.sourceId)
+    fun cleanCompletedImage(image: Image) {
+        mImageDao.delete(image.sourceId)
     }
 
     @WorkerThread
-    fun cleanCompletedPhoto(photos: List<Photo>) {
-        mPhotoDao.delete(photos.map { it.sourceId })
+    fun cleanCompletedImage(images: List<Image>) {
+        mImageDao.delete(images.map { it.sourceId })
     }
 
     @WorkerThread
-    fun converseDeleteToKeepPhoto(photo: Photo) {
-        mPhotoDao.convertDeleteToKeep(photo.sourceId)
+    fun converseDeleteToKeepImage(image: Image) {
+        mImageDao.convertDeleteToKeep(image.sourceId)
     }
 
     @WorkerThread
-    fun converseDeleteToKeepPhoto(photos: List<Photo>) {
-        mPhotoDao.convertDeleteToKeep(photos.map { it.sourceId })
+    fun converseDeleteToKeepImage(images: List<Image>) {
+        mImageDao.convertDeleteToKeep(images.map { it.sourceId })
     }
 
     @WorkerThread
     fun loadAlbums(): ArrayList<Album> {
         mAlbums.clear()
 
-        val deleteIds = mPhotoDao.getDeletePhotoIds()
-        val keepIds = mPhotoDao.getKeepPhotoIds()
+        val deleteIds = mImageDao.getDeleteImageIds()
+        val keepIds = mImageDao.getKeepImageIds()
 
         val projection = arrayOf(
             MediaStore.Images.Media._ID,
@@ -106,7 +106,7 @@ object AlbumController {
                 val uri =
                     ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
 
-                val photo = Photo(
+                val image = Image(
                     id,
                     size
                 ).apply {
@@ -121,15 +121,15 @@ object AlbumController {
                 val month = SimpleDateFormat(
                     "MMMM, yyyy",
                     Locale.getDefault()
-                ).format(photo.date)
+                ).format(image.date)
 
                 albums.takeIf { !it.containsKey(month) }?.put(month, Album(ArrayList(), month))
-                albums.get(month)?.photos?.add(photo)
+                albums.get(month)?.images?.add(image)
             }
         }
 
         albums.forEach { _, v ->
-            v.photos.sortByDescending { it.isOperated() }
+            v.images.sortByDescending { it.isOperated() }
             mAlbums.add(v)
         }
 
@@ -138,11 +138,11 @@ object AlbumController {
 
     @WorkerThread
     fun syncDatabase() {
-        val allPhotoIds = ArrayList<Long>()
+        val allImageIds = ArrayList<Long>()
         val operationIds = ArrayList<Long>()
 
-        operationIds.addAll(mPhotoDao.getDeletePhotoIds())
-        operationIds.addAll(mPhotoDao.getKeepPhotoIds())
+        operationIds.addAll(mImageDao.getDeleteImageIds())
+        operationIds.addAll(mImageDao.getKeepImageIds())
 
         val cursor = mAppContext.contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -154,12 +154,12 @@ object AlbumController {
         cursor?.use {
             val idIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             while (cursor.moveToNext()) {
-                allPhotoIds.add(cursor.getLong(idIndex))
+                allImageIds.add(cursor.getLong(idIndex))
             }
         }
 
-        operationIds.removeAll(allPhotoIds)
-        mPhotoDao.delete(operationIds)
+        operationIds.removeAll(allImageIds)
+        mImageDao.delete(operationIds)
     }
 
 }

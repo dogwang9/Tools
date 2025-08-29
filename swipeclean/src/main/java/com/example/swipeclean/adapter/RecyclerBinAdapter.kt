@@ -6,13 +6,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.swipeclean.model.Photo
+import com.example.swipeclean.model.Image
 import com.example.tools.R
 
 class RecyclerBinAdapter(
-    val photos: MutableList<Photo>,
-    val onItemRestoreClick: (photo: Photo, position: Int) -> Unit,
-    val onItemClick: (photoImageView: ImageView, photo: Photo, position: Int) -> Unit
+    val images: MutableList<Image>,
+    val onItemRestoreClick: (image: Image, position: Int) -> Unit,
+    val onItemClick: (photoImageView: ImageView, image: Image, position: Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerBinAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -29,36 +29,36 @@ class RecyclerBinAdapter(
         holder: MyViewHolder,
         position: Int
     ) {
-        val photo = photos[position]
+        val image = images[position]
 
         Glide
             .with(holder.itemView.context)
-            .load(photo.sourceUri)
+            .load(image.sourceUri)
             .placeholder(R.drawable.ic_vector_image)
-            .into(holder.photoImageView)
+            .into(holder.coverImageView)
 
         holder.keepView.setOnClickListener {
-            onItemRestoreClick.invoke(photo, holder.bindingAdapterPosition)
+            onItemRestoreClick.invoke(image, holder.bindingAdapterPosition)
         }
         holder.itemView.setOnClickListener {
-            onItemClick.invoke(holder.photoImageView, photo, holder.bindingAdapterPosition)
+            onItemClick.invoke(holder.coverImageView, image, holder.bindingAdapterPosition)
         }
     }
 
     override fun getItemCount(): Int {
-        return photos.size
+        return images.size
     }
 
-    fun removePhoto(photo: Photo) {
-        photos.remove(photo)
+    fun removeImage(image: Image) {
+        images.remove(image)
     }
 
     fun getTotalSize(): Long {
-        return photos.sumOf { item -> item.size }
+        return images.sumOf { item -> item.size }
     }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val photoImageView: ImageView = itemView.findViewById(R.id.iv_photo)
+        val coverImageView: ImageView = itemView.findViewById(R.id.iv_cover)
         val keepView: ImageView = itemView.findViewById(R.id.iv_keep)
     }
 }

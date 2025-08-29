@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <com.example.lib.photoview.PhotoView
-        android:id="@+id/v_photo"
+        android:id="@+id/v_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

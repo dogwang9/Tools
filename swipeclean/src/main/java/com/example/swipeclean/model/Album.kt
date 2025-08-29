@@ -3,25 +3,25 @@ package com.example.swipeclean.model
 import android.net.Uri
 
 data class Album(
-    val photos: MutableList<Photo>,
+    val images: MutableList<Image>,
     val formatData: String
 ) {
 
     fun getCoverUri(): Uri? {
-        if (photos.isEmpty()) return null
-        val photo = photos.firstOrNull { !it.isOperated() }
-        return photo?.sourceUri ?: photos.last().sourceUri
+        if (images.isEmpty()) return null
+        val image = images.firstOrNull { !it.isOperated() }
+        return image?.sourceUri ?: images.last().sourceUri
     }
 
     fun getId(): Long = formatData.hashCode().toLong()
 
-    fun getDateTime(): Long = photos.firstOrNull()?.date ?: 0L
+    fun getDateTime(): Long = images.firstOrNull()?.date ?: 0L
 
-    fun getTotalCount(): Int = photos.size
+    fun getTotalCount(): Int = images.size
 
-    fun getCompletedCount(): Int = photos.count { it.isKeep() }
+    fun getCompletedCount(): Int = images.count { it.isKeep() }
 
-    fun getOperatedIndex(): Int = photos.count { it.isOperated() }
+    fun getOperatedIndex(): Int = images.count { it.isOperated() }
 
     fun isCompleted(): Boolean = getTotalCount() == getCompletedCount()
 

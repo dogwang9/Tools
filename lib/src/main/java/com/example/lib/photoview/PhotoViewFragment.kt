@@ -641,6 +641,6 @@ class PhotoViewFragment() : Fragment() {
     }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val photoView: PhotoView = itemView.findViewById(R.id.v_photo)
+        val photoView: PhotoView = itemView.findViewById(R.id.v_image)
     }
 }

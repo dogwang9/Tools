@@ -171,13 +171,13 @@ class MainActivity : AppCompatActivity() {
                                                     AlbumController.getAlbums()
                                                         .find { it.getId() == albumId }
 
-                                                if (album?.photos?.isNotEmpty() == true) {
+                                                if (album?.images?.isNotEmpty() == true) {
                                                     mLoadingView.visibility = View.VISIBLE
                                                     val startTime = SystemClock.elapsedRealtime()
 
                                                     lifecycleScope.launch(Dispatchers.IO) {
-                                                        album.photos.let { photos ->
-                                                            AlbumController.cleanCompletedPhoto(
+                                                        album.images.let { photos ->
+                                                            AlbumController.cleanCompletedImage(
                                                                 photos
                                                             )
                                                             photos.forEach { it.cancelOperated() }
@@ -267,6 +267,6 @@ class MainActivity : AppCompatActivity() {
         val album = AlbumController.getAlbums()
             .find { it.getId() == albumId }
 
-        return album?.photos.isNullOrEmpty() || album.isOperated()
+        return album?.images.isNullOrEmpty() || album.isOperated()
     }
 }
