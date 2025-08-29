@@ -7,14 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.annotation.LayoutRes
 import com.example.swipeclean.activity.MainActivity
 import com.example.swipeclean.business.ConfigHost
 import com.example.tools.R
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class SortDialogFragment(@LayoutRes contentLayoutId: Int = R.layout.sheet_dialog_sort) :
-    BottomSheetDialogFragment(contentLayoutId) {
+class SortDialogFragment() : BottomSheetDialogFragment() {
 
     companion object {
         const val DATE_DOWN: Int = 0
@@ -25,7 +23,7 @@ class SortDialogFragment(@LayoutRes contentLayoutId: Int = R.layout.sheet_dialog
         const val UNFINISHED_UP: Int = 5
 
         fun newInstance(): SortDialogFragment {
-            return SortDialogFragment(R.layout.sheet_dialog_sort)
+            return SortDialogFragment()
         }
     }
 

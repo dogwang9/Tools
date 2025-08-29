@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.downloader.MyApplication
@@ -24,14 +23,13 @@ import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import java.io.File
 
-class HistoryDetailDialogFragment(@LayoutRes contentLayoutId: Int = R.layout.dialog_fragment_history_detail) :
-    BottomSheetDialogFragment(contentLayoutId) {
+class HistoryDetailDialogFragment() : BottomSheetDialogFragment() {
 
     companion object {
         private const val TAG_HISTORY = "tag_history"
 
         fun newInstance(taskHistory: TaskHistory): HistoryDetailDialogFragment {
-            val fragment = HistoryDetailDialogFragment(R.layout.dialog_fragment_history_detail)
+            val fragment = HistoryDetailDialogFragment()
             val bundle = Bundle()
             bundle.putParcelable(TAG_HISTORY, taskHistory)
             fragment.arguments = bundle
