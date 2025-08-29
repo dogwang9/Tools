@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="location">Location</string>
+    <string name="got_it">Got it</string>
+    <string name="open_in_google_map">Open in Google Map</string>
+</resources>

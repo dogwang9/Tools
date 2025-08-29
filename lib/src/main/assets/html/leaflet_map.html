@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Leaflet Map</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <style>
+        html, body, #map {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .custom-popup .leaflet-popup-content-wrapper {
+           padding: 3px;
+           border-radius: 8px;
+        }
+        .custom-popup .leaflet-popup-content {
+           margin: 0;
+           padding: 0;
+           text-align: center;
+        }
+        .custom-popup .leaflet-popup-tip {
+           width: 12px;
+           height: 12px;
+           box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    function showMap(lat, lng, path) {
+        const map = L.map('map', {
+            attributionControl: false, // copyright
+            zoomControl: false, // 不显示缩放控件
+            closePopupOnClick: false // 点击后pop不消失
+        }).setView([lat, lng], 12); // 缩放级别
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            subdomains: 'abcd',
+            maxZoom: 18,
+            detectRetina: true
+        }).addTo(map);
+
+        L.marker([lat, lng],{ icon: L.divIcon({ className: 'empty-icon' }),interactive: false}, {
+
+        }).addTo(map)
+            .bindPopup('<img src="' + path + '" width="60" height="60"/>', {
+               maxWidth: 60,              // 最大宽度
+               maxHeight: 60,               // 最大高度
+               autoClose: false,           // 点击地图不会关闭
+               closeOnClick: false,        // 点击 marker 不会关闭
+               closeButton: false,        // 不显示右上角的关闭按钮
+               className: 'custom-popup'
+             })
+            .openPopup();
+    }
+</script>
+</body>
+</html>

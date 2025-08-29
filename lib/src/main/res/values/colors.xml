@@ -13,4 +13,6 @@
     <color name="green_main">#03A670</color>
     <color name="red_main">#E52233</color>
 
+    <color name="colorPrimary">@color/blue_main</color>
+
 </resources>

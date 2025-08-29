@@ -11,6 +11,7 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.BitmapFactory
 import android.graphics.RectF
+import android.location.Geocoder
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
@@ -21,11 +22,13 @@ import android.view.inputmethod.InputMethodManager
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
 import androidx.annotation.RequiresPermission
+import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
 import java.io.File
+import java.io.IOException
 import java.util.Locale
 
 object AndroidUtils {
@@ -226,4 +229,34 @@ object AndroidUtils {
         context.startActivity(intent)
     }
 
+
+    /**
+     * 根据图片的uri获取经纬度信息
+     */
+    @WorkerThread
+    fun getLatLongByUri(context: Context, uri: Uri): DoubleArray? {
+        return try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                val exif = ExifInterface(inputStream)
+                exif.latLong
+            }
+        } catch (e: IOException) {
+            null
+        }
+    }
+
+    /**
+     * 根据经纬度获取位置信息
+     */
+    @WorkerThread
+    fun getAddress(context: Context, longitude: Double, latitude: Double): String? {
+        try {
+            val addresses =
+                Geocoder(context, Locale.getDefault()).getFromLocation(latitude, longitude, 1)
+            return if (addresses.isNullOrEmpty()) "" else addresses[0].getAddressLine(0)
+
+        } catch (_: IOException) {
+            return ""
+        }
+    }
 }
