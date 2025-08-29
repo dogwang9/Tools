@@ -41,41 +41,41 @@ class SortDialogFragment() : BottomSheetDialogFragment() {
         val activity = activity ?: return
         dialog?.window?.navigationBarColor = Color.TRANSPARENT
 
-        val vDate = view.findViewById<View>(R.id.v_date)
-        val vSize = view.findViewById<View>(R.id.v_size)
-        val vUnfinished = view.findViewById<View>(R.id.v_unfinished)
-        val ivDate = view.findViewById<ImageView>(R.id.iv_date)
-        val ivSize = view.findViewById<ImageView>(R.id.iv_size)
-        val ivUnfinished = view.findViewById<ImageView>(R.id.iv_unfinished)
+        val dateView = view.findViewById<View>(R.id.v_date)
+        val sizeView = view.findViewById<View>(R.id.v_size)
+        val unfinishedView = view.findViewById<View>(R.id.v_unfinished)
+        val dateImageView = view.findViewById<ImageView>(R.id.iv_date)
+        val sizeImageView = view.findViewById<ImageView>(R.id.iv_size)
+        val unfinishedImageView = view.findViewById<ImageView>(R.id.iv_unfinished)
 
         val sortType = ConfigHost.getSortType(activity)
         when (sortType) {
             DATE_DOWN -> {
-                ivDate.setImageResource(R.drawable.ic_vector_sort_down)
+                dateImageView.setImageResource(R.drawable.ic_vector_sort_down)
             }
 
             DATE_UP -> {
-                ivDate.setImageResource(R.drawable.ic_vector_sort_up)
+                dateImageView.setImageResource(R.drawable.ic_vector_sort_up)
             }
 
             SIZE_DOWN -> {
-                ivSize.setImageResource(R.drawable.ic_vector_sort_down)
+                sizeImageView.setImageResource(R.drawable.ic_vector_sort_down)
             }
 
             SIZE_UP -> {
-                ivSize.setImageResource(R.drawable.ic_vector_sort_up)
+                sizeImageView.setImageResource(R.drawable.ic_vector_sort_up)
             }
 
             UNFINISHED_DOWN -> {
-                ivUnfinished.setImageResource(R.drawable.ic_vector_sort_down)
+                unfinishedImageView.setImageResource(R.drawable.ic_vector_sort_down)
             }
 
             UNFINISHED_UP -> {
-                ivUnfinished.setImageResource(R.drawable.ic_vector_sort_up)
+                unfinishedImageView.setImageResource(R.drawable.ic_vector_sort_up)
             }
         }
 
-        vDate.setOnClickListener {
+        dateView.setOnClickListener {
             doOnClick(
                 when (sortType) {
                     DATE_DOWN -> DATE_UP
@@ -84,7 +84,7 @@ class SortDialogFragment() : BottomSheetDialogFragment() {
             )
         }
 
-        vSize.setOnClickListener {
+        sizeView.setOnClickListener {
             doOnClick(
                 when (sortType) {
                     SIZE_DOWN -> SIZE_UP
@@ -93,7 +93,7 @@ class SortDialogFragment() : BottomSheetDialogFragment() {
             )
         }
 
-        vUnfinished.setOnClickListener {
+        unfinishedView.setOnClickListener {
             doOnClick(
                 when (sortType) {
                     UNFINISHED_DOWN -> UNFINISHED_UP
