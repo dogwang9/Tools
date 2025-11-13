@@ -27,7 +27,6 @@ import com.example.swipeclean.dialog.SortDialogFragment
 import com.example.swipeclean.model.Album
 import com.example.swipeclean.other.Constants.KEY_INTENT_ALBUM_ID
 import com.example.swipeclean.other.Constants.MIN_SHOW_LOADING_TIME
-import com.example.swipeclean.viewmodel.MainViewModel
 import com.example.tools.R
 import com.example.tools.databinding.ActivityMainBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -35,7 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
+class MainActivity : BaseActivity<ActivityMainBinding>() {
     private lateinit var mAdapter: AlbumAdapter
     private val mPermissionLauncher1: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -75,7 +74,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
-            insets
+            WindowInsetsCompat.CONSUMED
         }
     }
 

@@ -5,15 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
 import java.lang.reflect.ParameterizedType
 
-abstract class BaseFragment<VM : ViewModel, VB : ViewBinding> : Fragment() {
+abstract class BaseFragment< VB : ViewBinding> : Fragment() {
 
     protected lateinit var binding: VB
-    protected lateinit var viewModel: VM
 
     abstract fun initView()
 
@@ -24,8 +21,6 @@ abstract class BaseFragment<VM : ViewModel, VB : ViewBinding> : Fragment() {
     ): View? {
         // 初始化 ViewBinding
         binding = getViewBinding(inflater, container)
-        // 初始化 ViewModel
-        viewModel = ViewModelProvider(this)[getViewModelClass()]
         initView()
         return binding.root
     }
@@ -37,7 +32,7 @@ abstract class BaseFragment<VM : ViewModel, VB : ViewBinding> : Fragment() {
     private fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VB {
         // 获取泛型 VB (即 ViewBinding 类) 的类型
         val type =
-            (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[1] as Class<VB>
+            (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<VB>
         // 调用 inflate(inflater, container, false)，生成 ViewBinding 实例
         val method = type.getMethod(
             "inflate",
@@ -46,13 +41,5 @@ abstract class BaseFragment<VM : ViewModel, VB : ViewBinding> : Fragment() {
             Boolean::class.java
         )
         return method.invoke(null, inflater, container, false) as VB
-    }
-
-    /**
-     * 通过反射获取 ViewModel 的具体类型
-     */
-    @Suppress("UNCHECKED_CAST")
-    private fun getViewModelClass(): Class<VM> {
-        return (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<VM>
     }
 }

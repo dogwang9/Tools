@@ -17,14 +17,11 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import android.widget.Button
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +32,8 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.lib.R
+import com.example.lib.databinding.FragmentPhotoViewBinding
+import com.example.lib.mvvm.BaseFragment
 import com.example.lib.utils.AndroidUtils
 import java.util.Locale
 import kotlin.math.min
@@ -42,7 +41,7 @@ import kotlin.math.min
 /**
 需要原图centerCrop，大图fitCenter
  */
-class PhotoViewFragment() : Fragment() {
+class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
     companion object {
         const val TAG_FRAGMENT = "tag_fragment"
         const val TAG_SIZE = "tag_size"
@@ -53,7 +52,7 @@ class PhotoViewFragment() : Fragment() {
         const val TAG_LOCATION_HEIGHT = "tag_location_height"
         const val TAG_URI = "tag_uri"
 
-        const val ANIMATOR_DURATION = 300L
+        const val ANIMATOR_DURATION = 3000L
 
         fun show(
             activity: FragmentActivity,
@@ -89,32 +88,21 @@ class PhotoViewFragment() : Fragment() {
     }
 
     private lateinit var mListener: Listener
-    private lateinit var mViewpager: ViewPager2
-    private lateinit var mTitleBar: View
-    private lateinit var mMainView: View
-    private lateinit var mTranslationImageView: ImageView
     private var mIsChangeBackgroundAnimating = false
     private var mIsEnterAnimating = false
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_photo_view, container, false)
-        ViewCompat.setOnApplyWindowInsetsListener(view.findViewById(R.id.main)) { v, insets ->
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val titleBar = view.findViewById<View>(R.id.v_title_bar)
-            titleBar.setPadding(
+            binding.clTitleBar.setPadding(
                 systemBars.left,
                 systemBars.top,
                 systemBars.right,
                 0
             )
-            insets
+            WindowInsetsCompat.CONSUMED
         }
-        initView(view)
-        return view
     }
 
     override fun onAttach(context: Context) {
@@ -132,28 +120,25 @@ class PhotoViewFragment() : Fragment() {
         })
     }
 
-    private fun initView(view: View) {
+    override fun initView() {
         val arguments = arguments ?: return
 
-        mTitleBar = view.findViewById(R.id.v_title_bar)
-        mMainView = view.findViewById(R.id.main)
-        mViewpager = view.findViewById(R.id.v_viewpager)
-        mTranslationImageView = view.findViewById(R.id.iv_transition)
-
-        val countTextView: TextView = view.findViewById(R.id.tv_count)
         val size = arguments.getInt(TAG_SIZE)
         val index = arguments.getInt(TAG_INDEX)
         val uri = arguments.getParcelable<Uri>(TAG_URI)
-        val (sourceWidth, sourceHeight) = AndroidUtils.getImageSizeFromUri(view.context, uri!!)
+        val (sourceWidth, sourceHeight) = AndroidUtils.getImageSizeFromUri(
+            binding.root.context,
+            uri!!
+        )
             ?: (0 to 0)
 
         if (sourceWidth == 0 || sourceHeight == 0) {
-            mTranslationImageView.visibility = View.GONE
-            mViewpager.visibility = View.VISIBLE
+            binding.ivTransition.visibility = View.GONE
+            binding.vpPhotos.visibility = View.VISIBLE
 
         } else {
-            mTranslationImageView.visibility = View.VISIBLE
-            mViewpager.visibility = View.INVISIBLE
+            binding.ivTransition.visibility = View.VISIBLE
+            binding.vpPhotos.visibility = View.INVISIBLE
 
             val locationX = arguments.getInt(TAG_LOCATION_X)
             val locationY = arguments.getInt(TAG_LOCATION_Y)
@@ -171,8 +156,8 @@ class PhotoViewFragment() : Fragment() {
             )
         }
 
-        mViewpager.offscreenPageLimit = 1
-        mViewpager.adapter = object : RecyclerView.Adapter<MyViewHolder>() {
+        binding.vpPhotos.offscreenPageLimit = 1
+        binding.vpPhotos.adapter = object : RecyclerView.Adapter<MyViewHolder>() {
             override fun onCreateViewHolder(
                 parent: ViewGroup,
                 viewType: Int
@@ -217,21 +202,21 @@ class PhotoViewFragment() : Fragment() {
             }
 
         }
-        mViewpager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        binding.vpPhotos.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                countTextView.text = String.format(Locale.getDefault(), "%d/%d", position + 1, size)
+                binding.tvCount.text = String.format(Locale.getDefault(), "%d/%d", position + 1, size)
             }
         })
 
         if (index == 0) {
-            countTextView.text = String.format(Locale.getDefault(), "%d/%d", 1, size)
+            binding.tvCount.text = String.format(Locale.getDefault(), "%d/%d", 1, size)
 
         } else {
-            mViewpager.setCurrentItem(index, false)
+            binding.vpPhotos.setCurrentItem(index, false)
         }
 
-        mViewpager.setPageTransformer { page, position ->
+        binding.vpPhotos.setPageTransformer { page, position ->
             val clampedPosition = position.coerceIn(-1f, 1f)
             val scale = 1f - kotlin.math.abs(clampedPosition) * 0.2f
             val alpha = 1f - kotlin.math.abs(clampedPosition) * 0.4f
@@ -241,7 +226,7 @@ class PhotoViewFragment() : Fragment() {
             page.alpha = alpha
         }
 
-        view.findViewById<Button>(R.id.btn_back).setOnClickListener {
+        binding.btnBack.setOnClickListener {
             doClose()
         }
     }
@@ -257,7 +242,7 @@ class PhotoViewFragment() : Fragment() {
         if (mIsEnterAnimating) {
             return
         }
-        val position = mViewpager.currentItem
+        val position = binding.vpPhotos.currentItem
         val recyclerView = mListener.getRecyclerView()
         recyclerView.scrollToPosition(position)
         recyclerView.post {
@@ -303,24 +288,24 @@ class PhotoViewFragment() : Fragment() {
         }
         val animatorSet = AnimatorSet()
         animatorSet.duration = 200
-        if (mTitleBar.isVisible) {
+        if (binding.clTitleBar.isVisible) {
             val colorAnimator = ObjectAnimator.ofArgb(
-                mMainView,
+                binding.root,
                 "backgroundColor",
                 Color.WHITE,
                 Color.BLACK
             )
             val alphaAnimator = ObjectAnimator.ofFloat(
-                mTitleBar,
+                binding.clTitleBar,
                 View.ALPHA,
                 1f,
                 0f
             )
             val translateAnimator = ObjectAnimator.ofFloat(
-                mTitleBar,
+                binding.clTitleBar,
                 View.TRANSLATION_Y,
                 0f,
-                -mTitleBar.height.toFloat()
+                -binding.clTitleBar.height.toFloat()
             )
             animatorSet.playTogether(
                 colorAnimator,
@@ -336,27 +321,27 @@ class PhotoViewFragment() : Fragment() {
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     mIsChangeBackgroundAnimating = false
-                    mTitleBar.visibility = View.INVISIBLE
+                    binding.clTitleBar.visibility = View.INVISIBLE
                 }
             })
 
         } else {
             val colorAnimator = ObjectAnimator.ofArgb(
-                mMainView,
+                binding.root,
                 "backgroundColor",
                 Color.BLACK,
                 Color.WHITE
             )
             val alphaAnimator = ObjectAnimator.ofFloat(
-                mTitleBar,
+                binding.clTitleBar,
                 View.ALPHA,
                 0f,
                 1f
             )
             val translateAnimator = ObjectAnimator.ofFloat(
-                mTitleBar,
+                binding.clTitleBar,
                 View.TRANSLATION_Y,
-                -mTitleBar.height.toFloat(),
+                -binding.clTitleBar.height.toFloat(),
                 0f
             )
             animatorSet.playTogether(
@@ -368,7 +353,7 @@ class PhotoViewFragment() : Fragment() {
                 override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     mIsChangeBackgroundAnimating = true
-                    mTitleBar.visibility = View.VISIBLE
+                    binding.clTitleBar.visibility = View.VISIBLE
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
@@ -404,18 +389,18 @@ class PhotoViewFragment() : Fragment() {
         val centerCropWidth = (sourceWidth * centerCropScale).toInt()
         val centerCropHeight = (sourceHeight * centerCropScale).toInt()
         Glide
-            .with(mTranslationImageView.context)
+            .with(binding.ivTransition.context)
             .load(uri)
             .override(centerCropWidth, centerCropHeight)
-            .into(mTranslationImageView)
+            .into(binding.ivTransition)
 
         //获取中心点
         val centerX = locationX + originWidth / 2f
         val centerY = locationY + originHeight / 2f
 
         //使transitionImageView对齐原始imageView中心点
-        mTranslationImageView.x = centerX - centerCropWidth / 2f
-        mTranslationImageView.y = centerY - centerCropHeight / 2f
+        binding.ivTransition.x = centerX - centerCropWidth / 2f
+        binding.ivTransition.y = centerY - centerCropHeight / 2f
 
         //获取transitionImageView全屏显示时需要放大的倍数
         val animatorScale = min(
@@ -427,23 +412,23 @@ class PhotoViewFragment() : Fragment() {
         animatorSet.duration = ANIMATOR_DURATION
         animatorSet.interpolator = FastOutSlowInInterpolator()
         val scaleXAnimator = ObjectAnimator.ofFloat(
-            mTranslationImageView,
+            binding.ivTransition,
             View.SCALE_X,
             animatorScale
         )
         val scaleYAnimator = ObjectAnimator.ofFloat(
-            mTranslationImageView,
+            binding.ivTransition,
             View.SCALE_Y,
             animatorScale
         )
         val backgroundAnimator = ObjectAnimator.ofArgb(
-            mMainView,
+            binding.root,
             "backgroundColor",
             Color.TRANSPARENT,
             Color.BLACK
         )
         val clipBoundAnimator = ObjectAnimator.ofObject(
-            mTranslationImageView,
+            binding.ivTransition,
             "clipBounds",
             RectEvaluator(),
             Rect(
@@ -455,16 +440,16 @@ class PhotoViewFragment() : Fragment() {
             Rect(0, 0, centerCropWidth, centerCropHeight)
         )
         val translateXAnimator = ObjectAnimator.ofFloat(
-            mTranslationImageView,
+            binding.ivTransition,
             View.TRANSLATION_X,
-            mTranslationImageView.translationX,
-            mTranslationImageView.translationX + AndroidUtils.getScreenWidth() / 2f - centerX
+            binding.ivTransition.translationX,
+            binding.ivTransition.translationX + AndroidUtils.getScreenWidth() / 2f - centerX
         )
         val translateYAnimator = ObjectAnimator.ofFloat(
-            mTranslationImageView,
+            binding.ivTransition,
             View.TRANSLATION_Y,
-            mTranslationImageView.translationY,
-            mTranslationImageView.translationY + AndroidUtils.getScreenHeight() / 2f - centerY
+            binding.ivTransition.translationY,
+            binding.ivTransition.translationY + AndroidUtils.getScreenHeight() / 2f - centerY
         )
         animatorSet.playTogether(
             scaleXAnimator,
@@ -482,28 +467,28 @@ class PhotoViewFragment() : Fragment() {
 
             override fun onAnimationEnd(animation: Animator) {
                 super.onAnimationEnd(animation)
-                mViewpager.visibility = View.VISIBLE
-                mTranslationImageView.visibility = View.INVISIBLE
+                binding.vpPhotos.visibility = View.VISIBLE
+                binding.ivTransition.visibility = View.INVISIBLE
 
                 //重置mTranslationImageView的状态
-                mTranslationImageView.scaleX = 1f
-                mTranslationImageView.scaleY = 1f
-                mTranslationImageView.translationX = 0f
-                mTranslationImageView.translationY = 0f
+                binding.ivTransition.scaleX = 1f
+                binding.ivTransition.scaleY = 1f
+                binding.ivTransition.translationX = 0f
+                binding.ivTransition.translationY = 0f
 
                 mIsEnterAnimating = false
             }
 
             override fun onAnimationCancel(animation: Animator) {
                 super.onAnimationCancel(animation)
-                mViewpager.visibility = View.VISIBLE
-                mTranslationImageView.visibility = View.INVISIBLE
+                binding.vpPhotos.visibility = View.VISIBLE
+                binding.ivTransition.visibility = View.INVISIBLE
 
                 //重置mTranslationImageView的状态
-                mTranslationImageView.scaleX = 1f
-                mTranslationImageView.scaleY = 1f
-                mTranslationImageView.translationX = 0f
-                mTranslationImageView.translationY = 0f
+                binding.ivTransition.scaleX = 1f
+                binding.ivTransition.scaleY = 1f
+                binding.ivTransition.translationX = 0f
+                binding.ivTransition.translationY = 0f
 
                 mIsEnterAnimating = false
             }
@@ -531,7 +516,7 @@ class PhotoViewFragment() : Fragment() {
         val centerCropHeight = (sourceHeight * scale).toInt()
 
         Glide
-            .with(mTranslationImageView.context)
+            .with(binding.ivTransition.context)
             .load(uri)
             .override(centerCropWidth, centerCropHeight)
             .addListener(object : RequestListener<Drawable> {
@@ -551,21 +536,21 @@ class PhotoViewFragment() : Fragment() {
                     dataSource: DataSource?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    mTranslationImageView.visibility = View.VISIBLE
-                    mViewpager.visibility = View.INVISIBLE
+                    binding.ivTransition.visibility = View.VISIBLE
+                    binding.vpPhotos.visibility = View.INVISIBLE
                     return false
                 }
 
             })
-            .into(mTranslationImageView)
+            .into(binding.ivTransition)
 
         //获取中心点
         val centerX = locationX + originWidth / 2f
         val centerY = locationY + originHeight / 2f
 
         //使transitionImageView移动到中间
-        mTranslationImageView.x = (AndroidUtils.getScreenWidth() - centerCropWidth) / 2f
-        mTranslationImageView.y = (AndroidUtils.getScreenHeight() - centerCropHeight) / 2f
+        binding.ivTransition.x = (AndroidUtils.getScreenWidth() - centerCropWidth) / 2f
+        binding.ivTransition.y = (AndroidUtils.getScreenHeight() - centerCropHeight) / 2f
 
         //获取transitionImageView全屏显示时需要放大的倍数
         val animatorScale = min(
@@ -577,25 +562,25 @@ class PhotoViewFragment() : Fragment() {
         animatorSet.duration = ANIMATOR_DURATION
         animatorSet.interpolator = DecelerateInterpolator()
         val scaleXAnimator = ObjectAnimator.ofFloat(
-            mTranslationImageView,
+            binding.ivTransition,
             View.SCALE_X,
             animatorScale,
             1f
         )
         val scaleYAnimator = ObjectAnimator.ofFloat(
-            mTranslationImageView,
+            binding.ivTransition,
             View.SCALE_Y,
             animatorScale,
             1f
         )
         val backgroundAnimator = ObjectAnimator.ofArgb(
-            mMainView,
+            binding.root,
             "backgroundColor",
-            if (mTitleBar.isVisible) Color.WHITE else Color.BLACK,
+            if (binding.clTitleBar.isVisible) Color.WHITE else Color.BLACK,
             Color.TRANSPARENT
         )
         val clipBoundAnimator = ObjectAnimator.ofObject(
-            mTranslationImageView,
+            binding.ivTransition,
             "clipBounds",
             RectEvaluator(),
             Rect(0, 0, centerCropWidth, centerCropHeight),
@@ -607,16 +592,16 @@ class PhotoViewFragment() : Fragment() {
             )
         )
         val translateXAnimator = ObjectAnimator.ofFloat(
-            mTranslationImageView,
+            binding.ivTransition,
             View.TRANSLATION_X,
-            mTranslationImageView.translationX,
-            mTranslationImageView.translationX + centerX - AndroidUtils.getScreenWidth() / 2f
+            binding.ivTransition.translationX,
+            binding.ivTransition.translationX + centerX - AndroidUtils.getScreenWidth() / 2f
         )
         val translateYAnimator = ObjectAnimator.ofFloat(
-            mTranslationImageView,
+            binding.ivTransition,
             View.TRANSLATION_Y,
-            mTranslationImageView.translationY,
-            mTranslationImageView.translationY + centerY - AndroidUtils.getScreenHeight() / 2f
+            binding.ivTransition.translationY,
+            binding.ivTransition.translationY + centerY - AndroidUtils.getScreenHeight() / 2f
         )
         animatorSet.playTogether(
             scaleXAnimator,

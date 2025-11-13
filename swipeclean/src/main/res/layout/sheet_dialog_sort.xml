@@ -28,7 +28,7 @@
         app:layout_constraintTop_toBottomOf="@id/iv_drag_bar" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/v_date"
+        android:id="@+id/ct_date"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="10dp"
@@ -60,11 +60,11 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/v_size"
+        android:id="@+id/ct_size"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@drawable/bg_ripple_select"
-        app:layout_constraintTop_toBottomOf="@id/v_date">
+        app:layout_constraintTop_toBottomOf="@id/ct_date">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_size"
@@ -91,12 +91,12 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/v_unfinished"
+        android:id="@+id/ct_unfinished"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@drawable/bg_ripple_select"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/v_size">
+        app:layout_constraintTop_toBottomOf="@id/ct_size">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_unfinished"

@@ -4,21 +4,16 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.graphics.Outline
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Base64
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Button
-import android.widget.TextView
 import androidx.annotation.RequiresPermission
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
@@ -27,9 +22,9 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.example.lib.R
+import com.example.lib.databinding.SheetPhotoLocationBinding
+import com.example.lib.mvvm.BaseBottomSheetDialogFragment
 import com.example.lib.utils.AndroidUtils
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,7 +35,7 @@ import java.util.Locale
 /**
  * 显示图片和位置信息的弹窗
  */
-class PhotoLocationDialogFragment() : BottomSheetDialogFragment() {
+class PhotoLocationDialogFragment() : BaseBottomSheetDialogFragment<SheetPhotoLocationBinding>() {
 
     companion object {
         const val KEY_ID_PHOTO_URI: String = "photo_uri"
@@ -64,31 +59,15 @@ class PhotoLocationDialogFragment() : BottomSheetDialogFragment() {
     }
 
     private val leafletMapHtmlPath = "file:///android_asset/html/leaflet_map.html"
-    private lateinit var mWebView: WebView
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val view: View = inflater.inflate(R.layout.sheet_photo_location, container, false)
-        initView(view)
-        return view
-    }
 
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility", "MissingPermission")
-    private fun initView(view: View) {
+    override fun initView() {
         val activity = activity ?: return
         val arguments = arguments ?: return
-        dialog?.window?.navigationBarColor = Color.TRANSPARENT
 
-        val locationTextView = view.findViewById<TextView>(R.id.tv_location)
-        val latLongTextView = view.findViewById<TextView>(R.id.tv_latlong)
-        val openInGoogleMapTextView = view.findViewById<TextView>(R.id.tv_open_in_google_map)
         //val locationIconImageView = view.findViewById<ImageView>(R.id.iv_location)
 
-        mWebView = view.findViewById(R.id.v_webview)
-        mWebView.outlineProvider = object : ViewOutlineProvider() {
+        binding.wvMap.outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(view: View?, outline: Outline?) {
                 view?.apply {
                     outline?.setRoundRect(
@@ -99,20 +78,20 @@ class PhotoLocationDialogFragment() : BottomSheetDialogFragment() {
             }
 
         }
-        mWebView.setClipToOutline(true)
+        binding.wvMap.setClipToOutline(true)
 
         val uri = arguments.getParcelable<Uri>(KEY_ID_PHOTO_URI)
         val longitude = arguments.getDouble(KEY_ID_LONGITUDE)
         val latitude = arguments.getDouble(KEY_ID_LATITUDE)
 
-        latLongTextView.text = String.format(
+        binding.tvLatlong.text = String.format(
             Locale.getDefault(),
             "%.2f, %.2f",
             latitude,
             longitude
         )
 
-        view.findViewById<Button>(R.id.btn_got_it).setOnClickListener {
+        binding.btnGotIt.setOnClickListener {
             dismissAllowingStateLoss()
         }
 
@@ -122,18 +101,18 @@ class PhotoLocationDialogFragment() : BottomSheetDialogFragment() {
         ).setPackage("com.google.android.apps.maps")
 
         if (intent.resolveActivity(activity.packageManager) != null) {
-            openInGoogleMapTextView.visibility = View.VISIBLE
-            openInGoogleMapTextView.setOnClickListener {
+            binding.tvOpenInGoogleMap.visibility = View.VISIBLE
+            binding.tvOpenInGoogleMap.setOnClickListener {
                 activity.startActivity(intent)
             }
 
         } else {
-            openInGoogleMapTextView.visibility = View.GONE
+            binding.tvOpenInGoogleMap.visibility = View.GONE
         }
 
         if (!AndroidUtils.isNetworkAvailable(activity)) {
-            mWebView.visibility = View.GONE
-            locationTextView.visibility = View.GONE
+            binding.wvMap.visibility = View.GONE
+            binding.tvLocation.visibility = View.GONE
             return
         }
 
@@ -149,17 +128,17 @@ class PhotoLocationDialogFragment() : BottomSheetDialogFragment() {
             val address = AndroidUtils.getAddress(activity, longitude, latitude)
             withContext(Dispatchers.Main) {
                 if (TextUtils.isEmpty(address)) {
-                    locationTextView.visibility = View.GONE
+                    binding.tvLocation.visibility = View.GONE
 
                 } else {
-                    locationTextView.text = address
+                    binding.tvLocation.text = address
                 }
             }
         }
 
-        mWebView.getSettings().javaScriptEnabled = true
-        mWebView.loadUrl(leafletMapHtmlPath)
-        mWebView.webViewClient = object : WebViewClient() {
+        binding.wvMap.getSettings().javaScriptEnabled = true
+        binding.wvMap.loadUrl(leafletMapHtmlPath)
+        binding.wvMap.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 uri ?: return
@@ -186,7 +165,7 @@ class PhotoLocationDialogFragment() : BottomSheetDialogFragment() {
                                 val js = "showMap($latitude, $longitude, $safeBase64)"
 
                                 withContext(Dispatchers.Main) {
-                                    mWebView.evaluateJavascript(js, null)
+                                    binding.wvMap.evaluateJavascript(js, null)
                                 }
                             }
                         }
@@ -198,13 +177,13 @@ class PhotoLocationDialogFragment() : BottomSheetDialogFragment() {
         }
 
         // 屏蔽webview的触摸事件
-        mWebView.setOnTouchListener { v, event ->
+        binding.wvMap.setOnTouchListener { v, event ->
             true
         }
     }
 
     override fun onDestroy() {
-        mWebView.destroy()
+        binding.wvMap.destroy()
         super.onDestroy()
     }
 }

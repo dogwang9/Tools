@@ -30,7 +30,6 @@ import com.example.swipeclean.business.AlbumController
 import com.example.swipeclean.model.Album
 import com.example.swipeclean.model.Image
 import com.example.swipeclean.other.Constants.KEY_INTENT_ALBUM_ID
-import com.example.swipeclean.viewmodel.MainViewModel
 import com.example.tools.R
 import com.example.tools.databinding.ActivityOperationBinding
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +38,7 @@ import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.max
 
-class OperationActivity : BaseActivity<MainViewModel, ActivityOperationBinding>() {
+class OperationActivity : BaseActivity<ActivityOperationBinding>() {
 
     companion object {
         const val PHOTO_OPERATION_KEEP = 0
@@ -80,7 +79,7 @@ class OperationActivity : BaseActivity<MainViewModel, ActivityOperationBinding>(
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+            WindowInsetsCompat.CONSUMED
         }
     }
 

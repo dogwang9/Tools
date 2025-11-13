@@ -34,7 +34,6 @@ import com.example.swipeclean.model.Album
 import com.example.swipeclean.model.Image
 import com.example.swipeclean.other.Constants.KEY_INTENT_ALBUM_ID
 import com.example.swipeclean.other.Constants.MIN_SHOW_LOADING_TIME
-import com.example.swipeclean.viewmodel.MainViewModel
 import com.example.tools.R
 import com.example.tools.databinding.ActivityRecycleBinBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -43,7 +42,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Collections
 
-class RecycleBinActivity : BaseActivity<MainViewModel, ActivityRecycleBinBinding>(), PhotoViewFragment.Listener {
+class RecycleBinActivity : BaseActivity<ActivityRecycleBinBinding>(), PhotoViewFragment.Listener {
     private lateinit var mAdapter: RecyclerBinAdapter
     private var mAlbum: Album? = null
 
@@ -99,10 +98,10 @@ class RecycleBinActivity : BaseActivity<MainViewModel, ActivityRecycleBinBinding
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+            WindowInsetsCompat.CONSUMED
         }
     }
 
