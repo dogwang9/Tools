@@ -52,7 +52,7 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
         const val TAG_LOCATION_HEIGHT = "tag_location_height"
         const val TAG_URI = "tag_uri"
 
-        const val ANIMATOR_DURATION = 3000L
+        const val ANIMATOR_DURATION = 300L
 
         fun show(
             activity: FragmentActivity,
@@ -91,20 +91,6 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
     private var mIsChangeBackgroundAnimating = false
     private var mIsEnterAnimating = false
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            binding.clTitleBar.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                0
-            )
-            WindowInsetsCompat.CONSUMED
-        }
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is Listener) {
@@ -121,6 +107,17 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
     }
 
     override fun initView() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.clTitleBar.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                0
+            )
+            WindowInsetsCompat.CONSUMED
+        }
+
         val arguments = arguments ?: return
 
         val size = arguments.getInt(TAG_SIZE)
@@ -247,6 +244,7 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
         if (mIsEnterAnimating) {
             return
         }
+        binding.clTitleBar.visibility = View.GONE
         val position = binding.vpPhotos.currentItem
         val recyclerView = mListener.getRecyclerView()
         recyclerView.scrollToPosition(position)
@@ -409,8 +407,8 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
 
         //获取transitionImageView全屏显示时需要放大的倍数
         val animatorScale = min(
-            AndroidUtils.getScreenWidth() / centerCropWidth.toFloat(),
-            AndroidUtils.getScreenHeight() / centerCropHeight.toFloat()
+            AndroidUtils.getScreenSize(activity).first / centerCropWidth.toFloat(),
+            AndroidUtils.getScreenSize(activity).second / centerCropHeight.toFloat()
         )
 
         val animatorSet = AnimatorSet()
@@ -448,13 +446,13 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
             binding.ivTransition,
             View.TRANSLATION_X,
             binding.ivTransition.translationX,
-            binding.ivTransition.translationX + AndroidUtils.getScreenWidth() / 2f - centerX
+            binding.ivTransition.translationX + AndroidUtils.getScreenSize(activity).first / 2f - centerX
         )
         val translateYAnimator = ObjectAnimator.ofFloat(
             binding.ivTransition,
             View.TRANSLATION_Y,
             binding.ivTransition.translationY,
-            binding.ivTransition.translationY + AndroidUtils.getScreenHeight() / 2f - centerY
+            binding.ivTransition.translationY + AndroidUtils.getScreenSize(activity).second / 2f - centerY
         )
         animatorSet.playTogether(
             scaleXAnimator,
@@ -554,13 +552,14 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
         val centerY = locationY + originHeight / 2f
 
         //使transitionImageView移动到中间
-        binding.ivTransition.x = (AndroidUtils.getScreenWidth() - centerCropWidth) / 2f
-        binding.ivTransition.y = (AndroidUtils.getScreenHeight() - centerCropHeight) / 2f
+        binding.ivTransition.x = (AndroidUtils.getScreenSize(activity).first - centerCropWidth) / 2f
+        binding.ivTransition.y =
+            (AndroidUtils.getScreenSize(activity).second - centerCropHeight) / 2f
 
         //获取transitionImageView全屏显示时需要放大的倍数
         val animatorScale = min(
-            AndroidUtils.getScreenWidth() / centerCropWidth.toFloat(),
-            AndroidUtils.getScreenHeight() / centerCropHeight.toFloat()
+            AndroidUtils.getScreenSize(activity).first / centerCropWidth.toFloat(),
+            AndroidUtils.getScreenSize(activity).second / centerCropHeight.toFloat()
         )
 
         val animatorSet = AnimatorSet()
@@ -600,13 +599,13 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
             binding.ivTransition,
             View.TRANSLATION_X,
             binding.ivTransition.translationX,
-            binding.ivTransition.translationX + centerX - AndroidUtils.getScreenWidth() / 2f
+            binding.ivTransition.translationX + centerX - AndroidUtils.getScreenSize(activity).first / 2f
         )
         val translateYAnimator = ObjectAnimator.ofFloat(
             binding.ivTransition,
             View.TRANSLATION_Y,
             binding.ivTransition.translationY,
-            binding.ivTransition.translationY + centerY - AndroidUtils.getScreenHeight() / 2f
+            binding.ivTransition.translationY + centerY - AndroidUtils.getScreenSize(activity).second / 2f
         )
         animatorSet.playTogether(
             scaleXAnimator,

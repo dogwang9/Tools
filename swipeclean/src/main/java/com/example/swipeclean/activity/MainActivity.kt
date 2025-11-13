@@ -207,6 +207,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                                 }
                             mAdapter.setHasStableIds(true)
 
+                            //为了让最后一项不被导航栏遮挡
                             binding.rvAlbums.addItemDecoration(object :
                                 RecyclerView.ItemDecoration() {
                                 override fun getItemOffsets(

@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.graphics.createBitmap
@@ -58,7 +59,7 @@ class OperationActivity : BaseActivity<ActivityOperationBinding>() {
     private var mTouchY = -1f
     private var mIsAnimating = false
     private var mIsOperating = false
-    private val mScreenWidth = AndroidUtils.getScreenWidth()
+    private var mScreenWidth: Int = 0
     private var mAlbum: Album? = null
 
     private val mRecycleBinLauncher = registerForActivityResult(
@@ -71,6 +72,7 @@ class OperationActivity : BaseActivity<ActivityOperationBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mScreenWidth = AndroidUtils.getScreenSize(this).first
         initView()
     }
 
@@ -78,7 +80,12 @@ class OperationActivity : BaseActivity<ActivityOperationBinding>() {
         super.onPostCreate(savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            binding.clTitleBar.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+
+            val layoutParams = binding.btnTrash.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.bottomMargin = systemBars.bottom + AndroidUtils.dpToPx(4)
+            binding.btnTrash.layoutParams = layoutParams
+
             WindowInsetsCompat.CONSUMED
         }
     }

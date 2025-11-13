@@ -21,6 +21,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
+import android.util.DisplayMetrics
 import android.view.View
 import android.view.Window
 import android.view.WindowInsets
@@ -41,17 +42,14 @@ import java.util.Locale
 object AndroidUtils {
 
     /**
-     * 获取屏幕宽度
+     * 获取屏幕宽高
      */
-    fun getScreenWidth(): Int {
-        return Resources.getSystem().displayMetrics.widthPixels
-    }
-
-    /**
-     * 获取屏幕高度
-     */
-    fun getScreenHeight(): Int {
-        return Resources.getSystem().displayMetrics.heightPixels
+    fun getScreenSize(activity: Activity?): Pair<Int, Int> {
+        return activity?.let {
+            val dm = DisplayMetrics()
+            activity.windowManager.defaultDisplay.getRealMetrics(dm)
+            Pair(dm.widthPixels, dm.heightPixels)
+        } ?: Pair(0, 0)
     }
 
     /**

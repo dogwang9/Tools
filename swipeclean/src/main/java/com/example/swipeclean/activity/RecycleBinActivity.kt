@@ -9,6 +9,7 @@ import android.os.SystemClock
 import android.provider.MediaStore
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
@@ -25,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.lib.mvvm.BaseActivity
 import com.example.lib.photoview.PhotoViewFragment
+import com.example.lib.utils.AndroidUtils
 import com.example.lib.utils.PermissionUtils
 import com.example.lib.utils.StringUtils.getHumanFriendlyByteCount
 import com.example.swipeclean.adapter.RecyclerBinAdapter
@@ -100,7 +102,16 @@ class RecycleBinActivity : BaseActivity<ActivityRecycleBinBinding>(), PhotoViewF
         super.onPostCreate(savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            binding.clTitleBar.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+
+            val layoutParams1 = binding.btnRestoreAll.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams1.bottomMargin = systemBars.bottom + AndroidUtils.dpToPx(4)
+            binding.btnRestoreAll.layoutParams = layoutParams1
+
+            val layoutParams2 = binding.btnGotIt.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams2.bottomMargin = systemBars.bottom + AndroidUtils.dpToPx(4)
+            binding.btnGotIt.layoutParams = layoutParams2
+
             WindowInsetsCompat.CONSUMED
         }
     }
