@@ -31,8 +31,8 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.example.lib.R
 import com.example.lib.databinding.FragmentPhotoViewBinding
+import com.example.lib.databinding.ItemPhotoViewBinding
 import com.example.lib.mvvm.BaseFragment
 import com.example.lib.utils.AndroidUtils
 import java.util.Locale
@@ -162,9 +162,13 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
                 parent: ViewGroup,
                 viewType: Int
             ): MyViewHolder {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_photo_view, parent, false)
-                return MyViewHolder(view)
+                return MyViewHolder(
+                    ItemPhotoViewBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                )
             }
 
             @SuppressLint("ClickableViewAccessibility")
@@ -172,8 +176,8 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
                 holder: MyViewHolder,
                 position: Int
             ) {
-                mListener.showPhoto(holder.photoView, position)
-                holder.photoView.setOnViewTapListener(object : OnViewTapListener {
+                mListener.showPhoto(holder.binding.vImage, position)
+                holder.binding.vImage.setOnViewTapListener(object : OnViewTapListener {
                     override fun onViewTap(
                         view: View?,
                         x: Float,
@@ -183,7 +187,7 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
                     }
 
                 })
-                holder.photoView.setOnSingleFlingListener(object : OnSingleFlingListener {
+                holder.binding.vImage.setOnSingleFlingListener(object : OnSingleFlingListener {
                     override fun onFling(
                         e1: MotionEvent?,
                         e2: MotionEvent?,
@@ -205,7 +209,8 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
         binding.vpPhotos.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                binding.tvCount.text = String.format(Locale.getDefault(), "%d/%d", position + 1, size)
+                binding.tvCount.text =
+                    String.format(Locale.getDefault(), "%d/%d", position + 1, size)
             }
         })
 
@@ -625,7 +630,5 @@ class PhotoViewFragment() : BaseFragment<FragmentPhotoViewBinding>() {
         animatorSet.start()
     }
 
-    class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val photoView: PhotoView = itemView.findViewById(R.id.v_image)
-    }
+    class MyViewHolder(val binding: ItemPhotoViewBinding) : RecyclerView.ViewHolder(binding.root)
 }
