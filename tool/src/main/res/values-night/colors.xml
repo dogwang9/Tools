@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="text_main">#E5E5E5</color>
+
+    <!--    reaction test-->
+    <color name="reaction_test_area_normal">#FF03DAC5</color>
+    <color name="reaction_test_area_change">#FFBB86FC</color>
+
+</resources>

@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">tool</string>
+
+<!--    reaction test-->
+    <string name="reaction_test_title">反应测试</string>
+    <string name="reaction_test_result">反应时间：%dms</string>
+    <string name="reaction_test_instruction">摁下\n开始测试反应时间\n颜色改变时立即抬起手指</string>
+    <string name="reaction_test_warning">注意：\n1. 测试时请保持手指在屏幕上\n2. 测试结束后再松开手指</string>
+
+
+</resources>
