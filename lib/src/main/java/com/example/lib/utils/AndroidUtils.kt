@@ -116,7 +116,7 @@ object AndroidUtils {
     /**
      * 设置导航栏是否为亮色
      */
-    fun setNavigationBarLight(window: Window,isLightNaviBar: Boolean) {
+    fun setNavigationBarLight(window: Window, isLightNaviBar: Boolean) {
         WindowCompat.getInsetsController(window, window.decorView).apply {
             isAppearanceLightNavigationBars = isLightNaviBar
         }
@@ -344,5 +344,18 @@ object AndroidUtils {
         } catch (_: IOException) {
             return ""
         }
+    }
+
+    fun copyToClipboard(context: Context?, text: String?, label: String? = "text") {
+        if (context == null || text.isNullOrEmpty()) {
+            return
+        }
+
+        val clipboard =
+            context.getSystemService(CLIPBOARD_SERVICE) as? ClipboardManager
+                ?: return
+
+        val clip = ClipData.newPlainText(label, text)
+        clipboard.setPrimaryClip(clip)
     }
 }
